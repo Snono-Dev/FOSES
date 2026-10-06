@@ -1,6 +1,6 @@
 import { getDB, saveLocal, replaceAll, resetDemo } from '../store.js';
-import { getSession, setSession, clearSession, getToken, setToken, fetchMe, deviceStart, devicePoll } from '../auth.js';
-import { ensureDataRepo, getRepo, readFile, writeRawFile, deleteFile } from '../github.js';
+import { getSession, setSession, clearSession, getToken, setToken, fetchMe, deviceStart, devicePoll, updateSession } from '../auth.js';
+import { ensureDataRepo, getRepo, readFile, writeRawFile, deleteFile, listRepos } from '../github.js';
 import { initialSync, pushNow } from '../sync.js';
 import { lastSyncError } from '../sync.js';
 import { validateCurriculumImport, normalizeImport, DB_DEFAULTS } from '../models.js';
@@ -218,6 +218,43 @@ export async function pRepo(el){
   <div id="diagOut" class="small" style="margin-top:8px"></div></div>`);
   el.querySelector('#retry').onclick = async () => { toast('جارٍ إعادة المزامنة...'); await initialSync(); pRepo(el); };
   el.querySelector('#diagBtn').onclick = () => runDiag(el.querySelector('#diagOut'));
+
+  // اختيار مستودع البيانات من مستودعاتك
+  el.insertAdjacentHTML('beforeend', `<div class="card" id="pickCard"><b>📦 اختيار مستودع البيانات</b>
+  <p class="muted small">الحالي: <span class="kbd" dir="ltr">${esc(sess.login)}/${esc(sess.repoName || CONFIG.dataRepoName)}</span> — اختر من مستودعاتك أو اكتب اسمًا جديدًا ليُنشأ.</p>
+  <div id="repoList" class="muted small">جارٍ جلب مستودعاتك...</div>
+  <div class="fld-row" style="margin-top:8px"><div class="fld"><span>اسم مستودع (جديد أو موجود)</span><input id="repoCustom" placeholder="fos-study-data" dir="ltr"></div></div>
+  <div class="row" style="margin-top:8px"><button class="btn sm" id="repoUse">استخدام / إنشاء</button></div></div>`);
+  const listBox = el.querySelector('#repoList');
+  try {
+    const repos = await listRepos(tok);
+    listBox.innerHTML = repos.length ? '' : 'لا مستودعات.';
+    repos.slice(0, 30).forEach(r => {
+      const b = document.createElement('button');
+      b.className = 'chip'; b.style.cssText = 'cursor:pointer;margin:2px;font-family:monospace';
+      b.textContent = `${r.name}${r.private ? ' 🔒' : ''}`;
+      if (r.name === (sess.repoName || CONFIG.dataRepoName)) b.style.borderColor = 'var(--ok)';
+      b.onclick = () => switchRepo(r.name);
+      listBox.appendChild(b);
+    });
+  } catch { listBox.textContent = 'تعذر الجلب — تحقق من الرمز.'; }
+  el.querySelector('#repoUse').onclick = () => {
+    const name = el.querySelector('#repoCustom').value.trim();
+    if (!name) return toast('اكتب اسم المستودع');
+    if (!/^[A-Za-z0-9._-]+$/.test(name)) return toast('اسم غير صالح (أحرف وأرقام و - _ . فقط)');
+    switchRepo(name);
+  };
+  async function switchRepo(name) {
+    if (name === (getSession()?.repoName || CONFIG.dataRepoName)) return toast('هذا هو الحالي بالفعل');
+    if (!confirm(`التبديل إلى «${name}»؟\nسيُحفظ الحالي أولًا، ثم تُجلب بيانات الجديد (أو يُرفع الحالي إليه إن كان فارغًا).`)) return;
+    toast('حفظ نسخة من الحالي...');
+    await pushNow('fos: backup before switch');
+    updateSession({ repoName: name, branch: 'main' });
+    toast('جارٍ الجلب من الجديد...');
+    await initialSync();
+    pRepo(el); toast('تم التبديل ✅');
+  }
+}
 }
 
 async function runDiag(out) {

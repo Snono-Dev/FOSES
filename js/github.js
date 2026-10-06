@@ -48,6 +48,9 @@ export async function writeRawFile(token, owner, repo, path, text, msg, branch='
 export async function deleteFile(token, owner, repo, path, sha, msg, branch='main'){
   return gh(`/repos/${owner}/${repo}/contents/${path}`, token, { method:'DELETE', body:JSON.stringify({message:msg, sha, branch}) });
 }
+export async function listRepos(token){
+  return gh('/user/repos?per_page=100&sort=updated&affiliation=owner', token);
+}
 // Batch pull/push of the known data files
 export async function pullAll(token, owner, repo, files, branch){
   const out={}, shas={};
