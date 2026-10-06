@@ -1,10 +1,16 @@
 // Shared Open Study OS visual components: rings, activity graph, map preview, sync panel.
 import { esc } from './config.js';
+import { lectureLabel } from './models.js';
 import { syncStatus } from './sync.js';
 import { getSession, getToken } from './auth.js';
 
 export const SUBJ_COLORS = ['#4F7CFF', '#22D3A6', '#F59E0B', '#F05252', '#10B981', '#8B7CFF'];
 export const subjColor = (s, i) => s?.color || SUBJ_COLORS[(i ?? 0) % SUBJ_COLORS.length];
+// عنوان الدرس = اسم المادة دائمًا → شارة فقط + رقم المحاضرة (بلا أي نص مكرر)
+export function lessonHead(db, sid, l) {
+  const lec = lectureLabel(l) ? `<span class="chip">${lectureLabel(l)}</span>` : '';
+  return `<div class="row" style="gap:6px">${subjBadge(db, sid)}${lec}</div>`;
+}
 // شارة المادة بلونها — لرؤيتها بسهولة داخل بطاقات الدروس
 export function subjBadge(db, sid) {
   const subs = db.subjects || [];

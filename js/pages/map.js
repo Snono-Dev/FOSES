@@ -1,5 +1,5 @@
 import { getDB } from '../store.js';
-import { computeStats, examScopeLabel, daysLabel, pagesLabel } from '../models.js';
+import { computeStats, examScopeLabel, daysLabel, pagesLabel, lectureLabel } from '../models.js';
 import { esc } from '../config.js';
 import { subjColor, ring } from '../components.js';
 import { icon } from '../icons.js';
@@ -28,7 +28,7 @@ export async function pMap(el, presetSid = null) {
       (c.topics || []).forEach(tp => {
         (tp.lessons || []).forEach(l => {
           const cls = l.completed ? 'done' : '';
-          h += `<div class="mstep ${cls}"><a class="mtitle" href="#/lesson/${id}/${c.id}/${tp.id}/${l.id}">${l.completed ? '●' : '○'} ${esc(l.title)}</a><div class="muted small">${esc(tp.title)} · ${l.duration || 30} د${pagesLabel(l.pageFrom, l.pageTo) ? ' · ' + pagesLabel(l.pageFrom, l.pageTo) : ''}${l.favorite ? ' · ⭐' : ''}</div></div>`;
+          h += `<div class="mstep ${cls}"><a class="mtitle" href="#/lesson/${id}/${c.id}/${tp.id}/${l.id}">${l.completed ? '●' : '○'} ${esc(tp.title)}</a>${lectureLabel(l) ? ` <span class="chip">${lectureLabel(l)}</span>` : ''}<div class="muted small">${l.duration || 30} د${pagesLabel(l.pageFrom, l.pageTo) ? ' · ' + pagesLabel(l.pageFrom, l.pageTo) : ''}${l.favorite ? ' · ⭐' : ''}</div></div>`;
         });
       });
       (exByCh[c.id] || []).forEach(e => {

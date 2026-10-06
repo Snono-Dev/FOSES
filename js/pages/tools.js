@@ -3,7 +3,7 @@ import { computeStats, levelFor, touchActivity, nextLessons, examScopeLabel, day
 import { esc, uid, now, todayKey } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
 import { icon } from '../icons.js';
-import { subjBadge } from '../components.js';
+import { subjBadge, lessonHead } from '../components.js';
 
 // ---- Progress ----
 export async function pProgress(el){
@@ -86,7 +86,7 @@ export async function pCalendar(el){
   <div class="card"><div class="cal-grid">${['ح','ن','ث','ر','خ','ج','س'].map(d=>`<b class="muted" style="text-align:center">${d}</b>`).join('')}${cells}</div>
   <p class="muted small"><b style="color:var(--warn)">●</b> امتحان · <b style="color:var(--primary)">●</b> تذكير درس · <b style="color:var(--secondary)">●</b> درس مسجل · <b style="color:var(--muted)">●</b> يدوي — اضغط اليوم لعرض التفاصيل.</p></div>
   <div class="os-panel"><div class="row spread"><span class="eyebrow">خطة اليوم · تلقائي</span><span class="row">دروس/يوم: <input id="pace" type="number" min="1" max="20" value="${pace}" style="width:64px"></span></div>
-  ${suggested.map(n=>`<a class="list-item" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}"><span>📖</span><div><b>${esc(n.l.title)}</b><div style="margin:4px 0">${subjBadge(db, n.s.id)}</div><div class="muted small">${esc(n.c.title)} · ${n.l.duration||30} د</div></div></a>`).join('')||'<p class="muted small">لا دروس متبقية 🎉</p>'}
+  ${suggested.map(n=>`<a class="list-item" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}"><span>📖</span><div>${lessonHead(db, n.s.id, n.l)}<div class="muted small">${esc(n.c.title)} · <span class="tname">${esc(n.t.title)}</span> · ${n.l.duration||30} د</div></div></a>`).join('')||'<p class="muted small">لا دروس متبقية 🎉</p>'}
   ${upcoming.map(e=>{const dl=daysLabel(e.date);return `<a class="list-item" href="#/exam/${e.id}"><span>◉</span><div><b>${esc(e.title)} · ${esc(dl.txt)}</b><div class="muted small">${esc(examScopeLabel(db,e))} · ${esc(e.date)}</div></div></a>`;}).join('')}</div>
   <h3>مواعيد يدوية</h3>${(db.events||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`<div class="list-item"><span>📌</span><div style="flex:1"><b>${esc(e.title)}</b><div class="muted small">${esc(e.date)}${e.time ? ' · ' + esc(e.time) : ''} · ${esc(e.kind || '')} ${esc(e.notes || '')}</div></div><button class="btn sm ghost" data-del="${e.id}">✕</button></div>`).join('')||'<div class="card muted">لا مواعيد يدوية.</div>'}`;
   el.querySelector('#pace').onchange=e=>{ db.settings.lessonsPerDay=Math.max(1,+e.target.value||3); saveLocal(); pCalendar(el); };

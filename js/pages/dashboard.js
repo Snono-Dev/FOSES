@@ -1,11 +1,11 @@
 import { getDB, saveLocal } from '../store.js';
-import { computeStats, examScopeLabel, daysLabel, dueCount, collectReminders, touchActivity, pagesLabel, todaySubjects, DAY_NAMES, completedToday, lectureLabel } from '../models.js';
-import { esc } from '../config.js';
+import { computeStats, examScopeLabel, daysLabel, dueCount, collectReminders, nextLessons, touchActivity, pagesLabel, todaySubjects, DAY_NAMES, completedToday, lectureLabel } from '../models.js';
+import { esc, todayKey } from '../config.js';
 import { getSession } from '../auth.js';
 import { toast } from '../ui.js';
 import { notifyNow } from '../notify.js';
 import { SS } from '../storage.js';
-import { subjBadge } from '../components.js';
+import { subjBadge, lessonHead } from '../components.js';
 
 function greeting() {
   const h = new Date().getHours();
@@ -26,7 +26,24 @@ export async function pDashboard(el) {
   }
 
   const rems = collectReminders(db);
-  const todayLessons = rems.filter(r => r.kind === 'lesson' && (r.overdue || r.today));
+  const tkey = todayKey();
+  // دروس اليوم = تذكير بتاريخ اليوم فقط (بلا ترحيل) + دروس مواد اليوم المدرسية (حتى بدون تذكير)
+  const todayLessons = rems.filter(r => r.kind === 'lesson' && r.date === tkey);
+  const pace = db.settings.lessonsPerDay || 3;
+  const schoolIds = new Set(todaySubjects(db).map(x => x.subject.id));
+  const schoolLessons = [];
+  if (schoolIds.size) {
+    outer: for (const s of db.subjects) {
+      if (!schoolIds.has(s.id)) continue;
+      const cur = db.curriculum[s.id];
+      for (const c of (cur?.chapters || [])) for (const t of (c.topics || [])) for (const l of (t.lessons || [])) {
+        if (l.completed || todayLessons.some(a => a.ref.l.id === l.id)) continue;
+        schoolLessons.push({ s, c, t, l });
+        if (schoolLessons.length >= pace) break outer;
+      }
+    }
+  }
+  const fallback = (!todayLessons.length && !schoolLessons.length) ? nextLessons(db, pace) : [];
   const upcoming = [...db.exams].filter(e => !e.done).sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')).slice(0, 5);
   const schoolToday = todaySubjects(db);
   const dayName = DAY_NAMES[new Date().getDay()];
@@ -39,9 +56,10 @@ export async function pDashboard(el) {
 
   <div class="os-panel"><span class="eyebrow">دروس اليوم 📌</span>
     ${todayLessons.map(r => `<div class="list-item" style="border-color:var(--warn)"><button class="icon-btn" data-ldone="${r.ref.l.id}" title="إنجاز">⭕</button>
-      <div style="flex:1"><b>${esc(r.title)}</b><div style="margin:4px 0">${subjBadge(db, r.ref.s.id)}</div><div class="muted small">${esc(r.ref.c.title)} · ${r.overdue ? 'متأخر ⚠️' : 'اليوم 📌'}</div></div>
-      <a class="btn sm ghost" href="${r.link}">فتح</a></div>`).join('')
-      || '<p class="muted">لا دروس لهذا اليوم 🎉.</p>'}
+      <div style="flex:1">${lessonHead(db, r.ref.s.id, r.ref.l)}<div class="muted small">${esc(r.ref.c.title)} · <span class="tname">${esc(r.ref.t.title)}</span> · تذكير اليوم 📌</div></div>
+      <a class="btn sm ghost" href="${r.link}">فتح</a></div>`).join('')}
+    ${schoolLessons.length ? `<p class="muted small" style="margin:10px 0 4px">من مواد اليوم المدرسية:</p>` + schoolLessons.map(n => `<a class="list-item" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}"><span>📖</span><div>${lessonHead(db, n.s.id, n.l)}<div class="muted small">${esc(n.c.title)} · <span class="tname">${esc(n.t.title)}</span></div></div></a>`).join('') : ''}
+    ${!todayLessons.length && !schoolLessons.length ? (fallback.length ? `<p class="muted small" style="margin:10px 0 4px">التالي للدراسة:</p>` + fallback.map(n => `<a class="list-item" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}"><span>📖</span><div>${lessonHead(db, n.s.id, n.l)}<div class="muted small">${esc(n.c.title)} · <span class="tname">${esc(n.t.title)}</span></div></div></a>`).join('') : '<p class="muted">لا دروس اليوم 🎉.</p>') : ''}
   </div>
 
   <div class="os-panel"><div class="row spread"><span class="eyebrow">مواد اليوم في المدرسة · ${dayName}</span><a class="os-go" href="#/timetable">الجدول ←</a></div>
@@ -57,7 +75,7 @@ export async function pDashboard(el) {
   </div>
 
   <div class="os-panel"><span class="eyebrow">منجز اليوم ✅</span>
-    ${doneToday.lessons.map(n => `<div class="list-item"><span>✅</span><div><b>${esc(n.l.title)}${lectureLabel(n.l) ? ' · ' + lectureLabel(n.l) : ''}</b><div class="muted small">${esc(n.s.name)} · ${esc(n.c.title)}</div></div></div>`).join('')}
+    ${doneToday.lessons.map(n => `<div class="list-item"><span>✅</span><div>${lessonHead(db, n.s.id, n.l)}<div class="muted small">${esc(n.c.title)} · <span class="tname">${esc(n.t.title)}</span></div></div></div>`).join('')}
     ${doneToday.exams.map(e => `<div class="list-item"><span>✅</span><div><b>${esc(e.title)}</b><div class="muted small">تذكير امتحان منجز</div></div></div>`).join('')}
     ${!doneToday.lessons.length && !doneToday.exams.length ? '<p class="muted">لم تُنجز شيئًا اليوم بعد — ابدأ من دروس اليوم بالأعلى 💪.</p>' : ''}
   </div>

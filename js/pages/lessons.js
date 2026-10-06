@@ -3,7 +3,7 @@ import { getDB, saveLocal } from '../store.js';
 import { esc, uid, now } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
 import { touchActivity, pagesLabel, lectureLabel, topicsForPages, topicsBetween } from '../models.js';
-import { subjBadge } from '../components.js';
+import { subjBadge, lessonHead } from '../components.js';
 import { icon } from '../icons.js';
 import { LS } from '../storage.js';
 
@@ -58,7 +58,7 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
       <div class="fld"><span>عنوان الدرس (اسم المادة تلقائيًا)</span><input id="mntitle" readonly></div>
       <div class="fld"><span>المدة (دقيقة)</span><input id="mndur" type="number" value="30"></div>
       <div class="fld"><span>رقم المحاضرة (تلقائي — قابل للتغيير)</span><input id="mnlec" type="number" placeholder="تلقائي"></div>
-      <div class="fld"><span>تاريخ تذكير (اختياري)</span><input id="mnrem" type="date"></div>
+      <div class="fld"><span>تاريخ تذكير (بدونه لن يظهر في دروس اليوم)</span><input id="mnrem" type="date"></div>
     </div>
     <div class="card" style="margin-top:10px;background:var(--card2)"><b>📚 المواضيع المشمولة (تلقائي)</b><div id="mdet" class="muted small">أدخل الصفحات لتُحدد المواضيع داخل المادة.</div>
     <div id="mmanual" class="hidden"><div class="fld-row" style="margin-top:8px"><div class="fld"><span>الفصل (يدوي)</span><select id="mnc"></select></div><div class="fld"><span>الموضوع (يدوي)</span><select id="mnt"></select></div></div></div>
@@ -153,9 +153,8 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
     if (fc) { if (n) { fc.textContent = n; fc.classList.remove('hidden'); } else fc.classList.add('hidden'); }
     el.querySelector('#llist').innerHTML = rows.length ? `<p class="muted small">${rows.length} درس</p>` + rows.map(n => `
       <div class="list-item"><button class="icon-btn" data-done="${n.l.id}" title="إنجاز">${n.l.completed ? icon('checkCircle', 20) : icon('circle', 20)}</button>
-      <div style="flex:1"><b>${esc(n.l.title)}${lectureLabel(n.l) ? ' · ' + lectureLabel(n.l) : ''}</b>
-      <div style="margin:4px 0">${subjBadge(db, n.s.id)}</div>
-      <div class="muted small">${esc(n.c.title)} · ${esc(n.t.title)}${pagesLabel(n.l.pageFrom, n.l.pageTo) ? ' · ' + pagesLabel(n.l.pageFrom, n.l.pageTo) : ''}${n.l.remindAt ? ' · 🔔 ' + esc(n.l.remindAt) : ''}</div></div>
+      <div style="flex:1">${lessonHead(db, n.s.id, n.l)}
+      <div class="muted small">${esc(n.c.title)} · <span class="tname">${esc(n.t.title)}</span>${pagesLabel(n.l.pageFrom, n.l.pageTo) ? ' · ' + pagesLabel(n.l.pageFrom, n.l.pageTo) : ''}${n.l.remindAt ? ' · 🔔 ' + esc(n.l.remindAt) : ''}</div></div>
       <a class="btn sm ghost" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}">فتح</a>
       <button class="btn sm ghost" data-del="${n.l.id}"><span class="ic">${icon('trash', 15)}</span></button></div>`).join('')
       : '<div class="card muted">لا دروس مطابقة — غيّر التصفية أو أضف درسًا بالأعلى.</div>';

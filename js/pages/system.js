@@ -43,7 +43,7 @@ export async function pLogin(el){
       const av=document.getElementById('avatar'); if(av) av.src=me.avatar_url;
       toast('تم الدخول ✅ جارٍ تجهيز مخزن البيانات...');
       await initialSync(); location.hash='#/dashboard';
-    }catch{ toast('الرمز غير صالح ❌'); }
+    }catch{ toast(!navigator.onLine?'لا إنترنت — تحقق من الاتصال ثم أعد المحاولة 📡':'الرمز غير صالح ❌'); }
   };
   el.querySelector('#dev').onclick=async()=>{
     const cid=el.querySelector('#cid').value.trim(); if(!cid) return toast('أدخل معرّف العميل');
@@ -55,7 +55,7 @@ export async function pLogin(el){
       setToken(t.access_token,true); SS.set('foses-token',t.access_token);
       setSession({login:me.login,name:me.name||me.login,avatar:me.avatar_url,email:me.email,id:me.id,repoName:CONFIG.dataRepoName,branch:'main',private:true}, true);
       await initialSync(); location.hash='#/dashboard';
-    }catch(e){ toast('فشل الربط: '+e.message); }
+    }catch(e){ toast(!navigator.onLine?'لا إنترنت — تحقق من الاتصال 📡':'فشل الربط: '+e.message); }
   };
 }
 

@@ -2,7 +2,7 @@ import { getDB, saveLocal } from '../store.js';
 import { esc, uid, now } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
 import { touchActivity, pagesLabel, lectureLabel } from '../models.js';
-import { subjColor } from '../components.js';
+import { subjColor, lessonHead } from '../components.js';
 import { icon } from '../icons.js';
 
 function subjectProgress(db, sid) {
@@ -27,13 +27,13 @@ export async function pSubjects(el){
     const col=subjColor(s,i), p=subjectProgress(db,s.id);
     const num=String(i+1).padStart(2,'0');
     const go=p.current?`#/lesson/${s.id}/${p.current.c.id}/${p.current.t.id}/${p.current.l.id}`:`#/subject/${s.id}`;
-    const goLabel=p.current?'→ متابعة':'→ مراجعة';
+    const goLabel=p.current?'متابعة الدراسة ←':(p.total?'مراجعة المادة ←':'فتح المادة ←');
     return `<div class="os-sub" style="--ac:${col}">
       <div class="row spread"><span class="os-num">${num}</span><span class="dot" style="background:${col};color:${col}"></span></div>
       <div class="os-name">${esc(s.icon||'')} ${esc(s.name)}</div>
       <div class="os-bar"><i style="width:${p.pct}%"></i></div>
       <div class="row spread"><span class="muted small">${p.curChapter?esc(p.curChapter.title):'لا فصول'} · ${p.done}/${p.total}</span><span class="chip">${p.pct}%</span></div>
-      <div class="row spread"><a class="os-go" href="${go}">${goLabel}</a><span class="row"><a class="btn sm ghost" href="#/subject/${s.id}">فتح</a><button class="btn sm ghost" data-del="${s.id}"><span class="ic">${icon('trash', 15)}</span></button></span></div>
+      <div class="row spread"><a class="btn sm" href="${go}">${goLabel}</a><button class="btn sm ghost" data-del="${s.id}"><span class="ic">${icon('trash', 15)}</span> حذف</button></div>
     </div>`;}).join('')||'<div class="card muted">لا مواد بعد.</div>'}</div>`;
   el.querySelector('#addSub').onclick=()=>{
     modal(`<h3>مادة جديدة</h3><label>الاسم</label><input id="sn" placeholder="مثال: الفيزياء"><label>الأيقونة</label><input id="si" value="📘"><div class="row" style="margin-top:12px"><button class="btn" id="ok">حفظ</button><button class="btn ghost" onclick="document.getElementById('modalRoot').innerHTML=''">إلغاء</button></div>`);
@@ -78,7 +78,7 @@ export async function pSubject(el,id){
     <div class="row"><button class="btn sm ghost" data-addtp="${c.id}"><span class="ic">${icon('plus', 15)}</span> موضوع</button><button class="btn sm ghost" data-delch="${c.id}"><span class="ic">${icon('trash', 15)}</span> حذف الفصل</button></div>
     ${(()=>{ const all=[]; (c.topics||[]).forEach(t=>(t.lessons||[]).forEach(l=>all.push({t,l}))); const dn=all.filter(x=>x.l.completed);
       return `<details class="done-box"><summary>✅ الدروس التي أخذتها في هذا الفصل (${dn.length}/${all.length})</summary>`
-      + (dn.length?dn.map(x=>`<a class="list-item" href="#/lesson/${s.id}/${c.id}/${x.t.id}/${x.l.id}"><span>✅</span><div><b>${esc(x.l.title)}</b><div class="muted small">${esc(x.t.title)}${pagesLabel(x.l.pageFrom,x.l.pageTo)?' · '+pagesLabel(x.l.pageFrom,x.l.pageTo):''}</div></div></a>`).join(''):'<p class="muted small">لم تُنجز دروسًا هنا بعد.</p>') + `</details>`; })()}</div>`).join('')||'<div class="card muted">لا فصول بعد.</div>'}`;
+      + (dn.length?dn.map(x=>`<a class="list-item" href="#/lesson/${s.id}/${c.id}/${x.t.id}/${x.l.id}"><span>✅</span><div>${lessonHead(db, s.id, x.l)}<div class="muted small">${esc(x.t.title)}${pagesLabel(x.l.pageFrom,x.l.pageTo)?' · '+pagesLabel(x.l.pageFrom,x.l.pageTo):''}</div></div></a>`).join(''):'<p class="muted small">لم تُنجز دروسًا هنا بعد.</p>') + `</details>`; })()}</div>`).join('')||'<div class="card muted">لا فصول بعد.</div>'}`;
   el.querySelector('#addCh').onclick=()=>{ cur.chapters.push({id:uid('ch'),title:`فصل ${cur.chapters.length+1}`,pageFrom:null,pageTo:null,topics:[]}); saveLocal(); pSubject(el,id); };
   el.querySelectorAll('[data-ech]').forEach(b=>b.onclick=()=>{ editCh=b.dataset.ech; editTp=null; pSubject(el,id); });
   el.querySelectorAll('[data-cch]').forEach(b=>b.onclick=()=>{ editCh=null; pSubject(el,id); });
@@ -113,7 +113,7 @@ export async function pTopic(el,sid,cid,tid){
   ${pagesLabel(tp.pageFrom,tp.pageTo)?`<div><span class="chip">${pagesLabel(tp.pageFrom,tp.pageTo)}</span></div>`:''}
   <div class="os-panel"><div class="row spread"><span class="muted small">${done}/${lessons.length} درس منجز</span><a class="btn sm" href="#/lessons/${sid}/${cid}/${tid}">➕ إدارة الدروس</a></div>
   <div class="progress" style="margin-top:8px"><i style="width:${lessons.length?Math.round(done/lessons.length*100):0}%"></i></div></div>
-  ${lessons.map(l=>`<a class="list-item" href="#/lesson/${sid}/${cid}/${tid}/${l.id}"><span>${l.completed?'✅':'⭕'}</span><div><b>${esc(l.title)}</b><div class="muted small">${l.duration||30} د${pagesLabel(l.pageFrom,l.pageTo)?' · '+pagesLabel(l.pageFrom,l.pageTo):''}${l.remindAt?' · 🔔 '+esc(l.remindAt):''}</div></div></a>`).join('')||'<div class="card muted">لا دروس في هذا الموضوع بعد — أضفها من تبويب الدروس.</div>'}`;
+  ${lessons.map(l=>`<a class="list-item" href="#/lesson/${sid}/${cid}/${tid}/${l.id}"><span>${l.completed?'✅':'⭕'}</span><div>${lessonHead(db, sid, l)}<div class="muted small">${l.duration||30} د${pagesLabel(l.pageFrom,l.pageTo)?' · '+pagesLabel(l.pageFrom,l.pageTo):''}${l.remindAt?' · 🔔 '+esc(l.remindAt):''}</div></div></a>`).join('')||'<div class="card muted">لا دروس في هذا الموضوع بعد — أضفها من تبويب الدروس.</div>'}`;
 }
 
 export async function pLesson(el,sid,cid,tid,lid){
@@ -123,16 +123,14 @@ export async function pLesson(el,sid,cid,tid,lid){
   if(!l){ el.innerHTML='<div class="card">الدرس غير موجود</div>'; return; }
   const sname=db.subjects.find(x=>x.id===sid)?.name||'';
   el.innerHTML=`<a href="#/topic/${sid}/${cid}/${tid}">← رجوع</a>
-  <div class="card"><h2>${l.completed?'✅':''} ${esc(l.title)} ${l.favorite?'⭐':''}</h2>
-  <div class="muted small" style="margin-bottom:8px">${esc(sname)} › ${esc(db.curriculum[sid]?.chapters.find(c=>c.id===cid)?.title||'')} › ${esc(tp.title)}</div>
+  <div class="card"><div class="row spread"><div>${lessonHead(db, sid, l)}</div><span>${l.completed?'✅':''} ${l.favorite?'⭐':''}</span></div>
+  <div class="fld-row"><div class="fld"><span>المادة</span><select id="ls"></select></div><div class="fld"><span>الفصل</span><select id="lc"></select></div><div class="fld"><span>الموضوع</span><select id="lt"></select></div></div>
+  <p class="muted small">تغيير الموقع ينقل الدرس فور الحفظ.</p>
   ${pagesLabel(l.pageFrom,l.pageTo)||lectureLabel(l)?`<div class="row">${pagesLabel(l.pageFrom,l.pageTo)?`<span class="chip">${pagesLabel(l.pageFrom,l.pageTo)}</span>`:''}${lectureLabel(l)?`<span class="chip">${lectureLabel(l)}</span>`:''}</div>`:''}
-  <p class="muted">${esc(l.desc||'')}</p>
-  <div class="card" style="background:var(--card2)">${esc(l.content||'لا محتوى بعد — أضف شرح الدرس أدناه.')}</div>
   <div class="fld-row"><div class="fld"><span>رقم المحاضرة (اختياري — امسحه للإزالة)</span><input id="llec" type="number" placeholder="تلقائي" value="${l.lectureNo ?? ''}"></div>
   <div class="fld"><span>تاريخ الإضافة (تلقائي)</span><input value="${esc((l.createdAt || '').slice(0, 10))}" disabled></div></div>
   <label>المدة (دقيقة)</label><input id="dur" type="number" value="${l.duration||30}">
-  <label>المحتوى</label><textarea id="content" rows="5">${esc(l.content||'')}</textarea>
-  <label>ملاحظاتي</label><textarea id="notes" rows="3">${esc(l.notes||'')}</textarea>
+  <label>ملاحظاتي (اختياري)</label><textarea id="notes" rows="3">${esc(l.notes||'')}</textarea>
   <label>🔔 تذكير بهذا الدرس بتاريخ <span class="hint">(يظهر في التنبيهات والجدول)</span></label>
   <div class="fld-row"><div class="fld"><span>تاريخ التذكير</span><input id="remind" type="date" value="${esc(l.remindAt||'')}"></div>${l.remindAt?`<div class="fld"><span>إدارة</span><button class="btn sm ghost" id="norem">إلغاء التذكير</button></div>`:''}</div>
   <label>📄 صفحات الكتاب لهذا الدرس <span class="hint">(اختياري — للصفحة الواحدة ضع نفس الرقم)</span></label>
@@ -142,7 +140,23 @@ export async function pLesson(el,sid,cid,tid,lid){
     <button class="btn ghost" id="fav"><span class="ic">${icon('star', 16)}</span> ${l.favorite ? 'إزالة من المفضلة' : 'مفضلة'}</button>
     <button class="btn ghost" id="save"><span class="ic">${icon('check', 16)}</span> حفظ</button>
   </div></div>`;
-  const save=()=>{ l.lectureNo=el.querySelector('#llec').value==='' ? null : +el.querySelector('#llec').value; l.duration=+el.querySelector('#dur').value||30; l.content=el.querySelector('#content').value; l.notes=el.querySelector('#notes').value; l.remindAt=el.querySelector('#remind').value||null; l.pageFrom=+el.querySelector('#pfrom').value||null; l.pageTo=+el.querySelector('#pto').value||l.pageFrom; saveLocal(); toast('تم الحفظ 💾'); };
+  const chOf = s2 => db.curriculum[s2]?.chapters || [];
+  const tpOf = (s2, c2) => chOf(s2).find(c => c.id === c2)?.topics || [];
+  const fLS = () => { el.querySelector('#ls').innerHTML = db.subjects.map(s => `<option value="${s.id}" ${s.id === sid ? 'selected' : ''}>${esc(s.name)}</option>`).join(''); };
+  const fLC = s2 => { el.querySelector('#lc').innerHTML = chOf(s2).map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join(''); };
+  const fLT = (s2, c2) => { el.querySelector('#lt').innerHTML = tpOf(s2, c2).map(t => `<option value="${t.id}">${esc(t.title)}</option>`).join(''); };
+  fLS(); fLC(sid); el.querySelector('#lc').value = cid; fLT(sid, cid); el.querySelector('#lt').value = tid;
+  el.querySelector('#ls').onchange = e => { fLC(e.target.value); fLT(e.target.value, el.querySelector('#lc').value); };
+  el.querySelector('#lc').onchange = e => fLT(el.querySelector('#ls').value, e.target.value);
+  const save=()=>{ l.lectureNo=el.querySelector('#llec').value==='' ? null : +el.querySelector('#llec').value; l.duration=+el.querySelector('#dur').value||30; l.notes=el.querySelector('#notes').value; l.remindAt=el.querySelector('#remind').value||null; l.pageFrom=+el.querySelector('#pfrom').value||null; l.pageTo=+el.querySelector('#pto').value||l.pageFrom;
+    const nsid=el.querySelector('#ls').value, ncid=el.querySelector('#lc').value, ntid=el.querySelector('#lt').value;
+    if(nsid&&ncid&&ntid&&(nsid!==sid||ncid!==cid||ntid!==tid)){
+      const dst=db.curriculum[nsid]?.chapters.find(c=>c.id===ncid)?.topics.find(t=>t.id===ntid);
+      if(!dst) return toast('الموقع الجديد غير موجود');
+      const ix=(tp.lessons||[]).findIndex(x=>x.id===l.id); if(ix>=0) tp.lessons.splice(ix,1);
+      dst.lessons.push(l); saveLocal(); location.hash=`#/lesson/${nsid}/${ncid}/${ntid}/${l.id}`; toast('نُقل الدرس ✅'); return;
+    }
+    saveLocal(); toast('تم الحفظ 💾'); };
   el.querySelector('#save').onclick=save;
   el.querySelector('#norem') && (el.querySelector('#norem').onclick=()=>{ l.remindAt=null; saveLocal(); pLesson(el,sid,cid,tid,lid); });
   el.querySelector('#fav').onclick=()=>{ l.favorite=!l.favorite; saveLocal(); pLesson(el,sid,cid,tid,lid); };

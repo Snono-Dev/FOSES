@@ -11,7 +11,8 @@ let timer=null, syncing=false, lastStatus='local', lastError='';
 const subs=new Set();
 export const onSync=s=>{subs.add(s);return()=>subs.delete(s)};
 function setStatus(st,msg){ lastStatus=st; if(st==='error'&&msg)lastError=msg; if(st!=='error')lastError=''; subs.forEach(f=>{try{f(st,msg)}catch{}}); paintDot(st); }
-function paintDot(st){ const d=document.getElementById('syncDot'); if(!d) return; const paused=!autoSyncOn()&&(st==='local'); d.className='sync-dot'+(st==='synced'?'':st==='local'?(paused?' paused':' off'):' err'); d.title='sync: '+st+(paused?' (التلقائية متوقفة)':'')+(st==='error'&&lastError?' — '+lastError:''); }
+function paintDot(st){ const d=document.getElementById('syncDot'); if(!d) return; const paused=!autoSyncOn()&&(st==='local'); d.className='sync-dot'+(st==='synced'?'':st==='offline'?' offline':st==='local'?(paused?' paused':' off'):' err'); d.title='sync: '+st+(paused?' (التلقائية متوقفة)':'')+(st==='offline'?' (لا إنترنت)':'')+(st==='error'&&lastError?' — '+lastError:''); }
+const isOffline=()=> (typeof navigator!=='undefined') && ('onLine' in navigator) && !navigator.onLine;
 export const syncStatus=()=>lastStatus;
 export const lastSyncError=()=>lastError;
 export const getShas=()=>shas;
@@ -73,7 +74,7 @@ export async function initialSync(){
       await pushNow('init 🌱 تهيئة مخزن الدراسة');
     }
     setStatus('synced'); return true;
-  }catch(e){ console.warn(e); setStatus('error',e.message); return false; }
+  }catch(e){ console.warn(e); if(isOffline()){ setStatus('offline'); } else setStatus('error',e.message); return false; }
 }
 
 export function schedulePush(){
@@ -91,9 +92,10 @@ export async function pushNow(msg='📚 fos: sync'){
     const snap={}; for(const f of CONFIG.files){ snap[f.replace('.json','')]=db[f.replace('.json','')] ?? null; }
     shas=await pushAll(tok,sess.login,sess.repoName||CONFIG.dataRepoName,snap,shas,sess.branch||'main');
     setStatus('synced'); return true;
-  }catch(e){ console.warn(e); setStatus('error',e.message); return false; }
+  }catch(e){ console.warn(e); if(isOffline()){ setStatus('offline'); } else setStatus('error',e.message); return false; }
   finally{ syncing=false; }
 }
 
 window.addEventListener('foses-dirty', ()=>schedulePush());
-window.addEventListener('online', ()=>{ if(autoSyncOn()) pushNow('📚 fos: reconnect sync'); });
+window.addEventListener('online', ()=>{ setStatus('local'); if(autoSyncOn()) pushNow('📚 fos: reconnect sync'); });
+window.addEventListener('offline', ()=>setStatus('offline'));
