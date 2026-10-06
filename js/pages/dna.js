@@ -31,6 +31,7 @@ export async function pDNA(el) {
   }).join('') || '<p class="muted">لا مواد بعد.</p>'}</div>
   <div class="grid cols2">
     <div class="stat-mini"><div class="v">🔥 ${db.progress?.streak || 0}</div><div class="k">يوم متتالي</div></div>
+    <div class="stat-mini"><div class="v">🎓 ${st.subjectsDone}/${st.subjectsTotal}</div><div class="k">مادة منجزة (${st.subjectsPct}%)</div></div>
     <div class="stat-mini"><div class="v">📖 ${st.done}</div><div class="k">درس مكتمل</div></div>
     <div class="stat-mini"><div class="v">◉ ${examsTaken}</div><div class="k">امتحان منجز</div></div>
     <div class="stat-mini"><div class="v">⏱️ ${hh}h ${mm}m</div><div class="k">وقت الدراسة</div></div>

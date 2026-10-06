@@ -5,6 +5,7 @@ import { getSession } from '../auth.js';
 import { toast } from '../ui.js';
 import { notifyNow } from '../notify.js';
 import { SS } from '../storage.js';
+import { subjBadge } from '../components.js';
 
 function greeting() {
   const h = new Date().getHours();
@@ -25,10 +26,7 @@ export async function pDashboard(el) {
   }
 
   const rems = collectReminders(db);
-  const dueLessons = rems.filter(r => r.kind === 'lesson' && (r.overdue || r.today));
-  const dueIds = new Set(dueLessons.map(r => r.ref.l.id));
-  const pace = db.settings.lessonsPerDay || 3;
-  const plan = nextLessons(db, 20).filter(n => !dueIds.has(n.l.id)).slice(0, pace);
+  const todayLessons = rems.filter(r => r.kind === 'lesson' && (r.overdue || r.today));
   const upcoming = [...db.exams].filter(e => !e.done).sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')).slice(0, 5);
   const schoolToday = todaySubjects(db);
   const dayName = DAY_NAMES[new Date().getDay()];
@@ -38,13 +36,11 @@ export async function pDashboard(el) {
     <h1>${greeting()}${sess?.name ? '، ' + esc(sess.name.split(' ')[0]) : ''} 👋</h1>
     <div class="os-tag">مدرستك · بياناتك · مفتوح المصدر</div></div>
 
-  <div class="os-panel"><span class="eyebrow">الدروس المطلوبة</span>
-    ${dueLessons.map(r => `<div class="list-item" style="border-color:var(--warn)"><button class="icon-btn" data-ldone="${r.ref.l.id}" title="إنجاز">⭕</button>
-      <div style="flex:1"><b>${esc(r.title)}</b><div class="muted small">${esc(r.sub)} · ${r.overdue ? 'متأخر ⚠️' : 'اليوم 📌'}</div></div>
-      <a class="btn sm ghost" href="${r.link}">فتح</a></div>`).join('')}
-    ${plan.map(n => `<a class="list-item" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}"><span>📖</span>
-      <div><b>${esc(n.l.title)}</b><div class="muted small">${esc(n.s.name)} · ${esc(n.c.title)}${pagesLabel(n.l.pageFrom, n.l.pageTo) ? ' · ' + pagesLabel(n.l.pageFrom, n.l.pageTo) : ''}</div></div></a>`).join('')}
-    ${!dueLessons.length && !plan.length ? '<p class="muted">لا دروس مطلوبة 🎉 — كل شيء منجز.</p>' : ''}
+  <div class="os-panel"><span class="eyebrow">دروس اليوم 📌</span>
+    ${todayLessons.map(r => `<div class="list-item" style="border-color:var(--warn)"><button class="icon-btn" data-ldone="${r.ref.l.id}" title="إنجاز">⭕</button>
+      <div style="flex:1"><b>${esc(r.title)}</b><div style="margin:4px 0">${subjBadge(db, r.ref.s.id)}</div><div class="muted small">${esc(r.ref.c.title)} · ${r.overdue ? 'متأخر ⚠️' : 'اليوم 📌'}</div></div>
+      <a class="btn sm ghost" href="${r.link}">فتح</a></div>`).join('')
+      || '<p class="muted">لا دروس لهذا اليوم 🎉.</p>'}
   </div>
 
   <div class="os-panel"><div class="row spread"><span class="eyebrow">مواد اليوم في المدرسة · ${dayName}</span><a class="os-go" href="#/timetable">الجدول ←</a></div>
@@ -62,14 +58,14 @@ export async function pDashboard(el) {
   <div class="grid cols2">
     <div class="stat-mini"><div class="v">🔥 ${db.progress?.streak || 0}</div><div class="k">يوم استمرارية</div></div>
     <div class="stat-mini"><div class="v">⭐ ${db.progress?.xp || 0}</div><div class="k">نقطة</div></div>
-    <div class="stat-mini"><div class="v">📖 ${st.done}/${st.total}</div><div class="k">درس منجز</div></div>
+    <div class="stat-mini"><div class="v">🎓 ${st.subjectsDone}/${st.subjectsTotal}</div><div class="k">مادة منجزة (${st.subjectsPct}%)</div></div>
     <div class="stat-mini"><div class="v">⏱️ ${db.progress?.studyMinutes || 0}</div><div class="k">دقيقة دراسة</div></div>
   </div>
 
   ${!sess?.login ? `<div class="os-panel"><b>سجّل الدخول بـ GitHub</b><p class="muted small">ليُحفظ تقدمك تلقائيًا في مستودعك الخاص. أو جرّب الوضع التجريبي.</p><a class="btn" href="#/login">تسجيل الدخول</a></div>` : ''}`;
 
   el.querySelectorAll('[data-ldone]').forEach(b => b.onclick = () => {
-    const r = dueLessons.find(x => x.ref.l.id === b.dataset.ldone); if (!r) return;
+    const r = todayLessons.find(x => x.ref.l.id === b.dataset.ldone); if (!r) return;
     r.ref.l.completed = true; r.ref.l.lastStudied = new Date().toISOString();
     db.progress.xp = (db.progress.xp || 0) + 50; touchActivity(db);
     saveLocal(); toast('أحسنت! +50 XP 🎉'); pDashboard(el);

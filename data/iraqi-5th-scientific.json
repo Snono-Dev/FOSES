@@ -1,0 +1,1411 @@
+{
+  "subjects": [
+    {
+      "name": "الفيزياء",
+      "description": "منهج الفيزياء للصف الخامس العلمي - المنهج العراقي",
+      "icon": "⚛️",
+      "chapters": [
+        {
+          "title": "الفصل الأول: المتجهات",
+          "pages": null,
+          "topics": [
+            {
+              "title": "أنظمة الإحداثيات والكميات",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "1-1 أنظمة الإحداثيات",
+                  "content": "أنواع أنظمة الإحداثيات: الكارتيزية والقطبية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "1-2 العلاقة بين الإحداثيات الكارتيزية والقطبية",
+                  "content": "التحويل بين الإحداثيات الكارتيزية والقطبية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "1-3 الكميات القياسية والكميات المتجهة",
+                  "content": "الفرق بين الكميات القياسية والمتجهة وأمثلة عليهما.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "1-4 بعض خصائص المتجهات",
+                  "content": "خصائص المتجهات الأساسية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "جمع المتجهات وضربها",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "1-5 جمع المتجهات",
+                  "content": "طرق جمع المتجهات هندسيًا وتحليليًا.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "1-6 ضرب المتجهات",
+                  "content": "الضرب القياسي والضرب الاتجاهي للمتجهات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الثاني: الحركة",
+          "pages": null,
+          "topics": [
+            {
+              "title": "وصف الحركة",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "2-1 وصف الحركة",
+                  "content": "مفهوم الحركة ووصفها فيزيائيًا.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-2 أطر الإسناد",
+                  "content": "مفهوم أطر الإسناد ودورها في وصف الحركة.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-3 الموقع والإزاحة والمسافة",
+                  "content": "الفرق بين الموقع والإزاحة والمسافة المقطوعة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "السرعة والتعجيل",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "2-4 السرعة المتوسطة",
+                  "content": "تعريف السرعة المتوسطة وحسابها.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-5 الانطلاق المتوسط",
+                  "content": "تعريف الانطلاق المتوسط والفرق بينه وبين السرعة.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-6 السرعة الآنية والانطلاق الآني",
+                  "content": "مفهوم السرعة الآنية والانطلاق الآني.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-7 الحركة بسرعة ثابتة",
+                  "content": "خصائص الحركة المنتظمة بسرعة ثابتة.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-8 التعجيل",
+                  "content": "مفهوم التعجيل وأنواعه.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "معادلات الحركة والسقوط الحر",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "2-9 معادلات الحركة الخطية بتعجيل منتظم",
+                  "content": "معادلات الحركة الخطية وتطبيقاتها.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-10 تعجيل الجاذبية",
+                  "content": "تعجيل الجاذبية الأرضية وتأثيره على الأجسام.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-11 معادلات الحركة في السقوط الحر",
+                  "content": "تطبيق معادلات الحركة على السقوط الحر.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-12 الحركة في بعدين (الحركة في مستوى)",
+                  "content": "وصف الحركة في بعدين ومستوى واحد.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الثالث: قوانين الحركة",
+          "pages": null,
+          "topics": [
+            {
+              "title": "القوة وقوانين نيوتن",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "3-1 مفهوم القوة وأنواعها",
+                  "content": "تعريف القوة وأنواع القوى في الطبيعة.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-2 القصور الذاتي والكتلة",
+                  "content": "العلاقة بين القصور الذاتي والكتلة.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-3 قوانين نيوتن في الحركة",
+                  "content": "قوانين نيوتن الثلاثة في الحركة.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-4 تطبيقات عن قوانين الحركة",
+                  "content": "مسائل وتطبيقات على قوانين نيوتن.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-5 مخطط الجسم الحر",
+                  "content": "رسم مخطط الجسم الحر لتحليل القوى.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-6 الاحتكاك",
+                  "content": "قوة الاحتكاك وأنواعها وحسابها.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الرابع: الاتزان والعزوم",
+          "pages": null,
+          "topics": [
+            {
+              "title": "شروط الاتزان",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "4-1 مفهوم الاتزان",
+                  "content": "مفهوم الاتزان الميكانيكي للأجسام.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-2 شرط الاتزان الانتقالي",
+                  "content": "شرط تحقق الاتزان الانتقالي.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-3 شرط الاتزان الدوراني",
+                  "content": "شرط تحقق الاتزان الدوراني.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "العزوم ومركز الكتلة",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "4-4 العزم",
+                  "content": "تعريف العزم وحسابه.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-5 العزم كمية متجهة",
+                  "content": "الطبيعة الاتجاهية للعزم.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-6 صافي العزوم واتجاه الدوران",
+                  "content": "حساب صافي العزوم وتحديد اتجاه الدوران.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-7 المزدوج",
+                  "content": "مفهوم المزدوج وتأثيره.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-8 مركز الكتلة",
+                  "content": "تعريف مركز الكتلة وطريقة تحديده.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-9 مركز الثقل",
+                  "content": "تعريف مركز الثقل والفرق بينه وبين مركز الكتلة.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الخامس: الشغل والقدرة والطاقة والزخم",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الشغل والقدرة والطاقة",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "5-1 مفهوم الشغل",
+                  "content": "تعريف الشغل وحسابه فيزيائيًا.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-2 التمثيل البياني للشغل",
+                  "content": "حساب الشغل من المنحني البياني.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-3 القدرة",
+                  "content": "تعريف القدرة ووحداتها.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-4 الطاقة",
+                  "content": "أشكال الطاقة: الحركية والكامنة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-5 حفظ الطاقة الميكانيكية",
+                  "content": "مبدأ حفظ الطاقة الميكانيكية.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-6 الشغل المبذول بوساطة القوى غير المحافظة",
+                  "content": "تأثير القوى غير المحافظة على الطاقة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-7 قانون حفظ الطاقة",
+                  "content": "الصيغة العامة لقانون حفظ الطاقة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "الزخم الخطي",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "5-8 الزخم الخطي والدفع",
+                  "content": "تعريف الزخم الخطي والدفع والعلاقة بينهما.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-9 حفظ الزخم الخطي",
+                  "content": "قانون حفظ الزخم الخطي وتطبيقاته.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل السادس: الديناميكيا الحرارية (التحرك الحراري)",
+          "pages": null,
+          "topics": [
+            {
+              "title": "قوانين الديناميكيا الحرارية",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "6-1 النظام والوسط المحيط به",
+                  "content": "مفهوم النظام والوسط المحيط في الثرموديناميك.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-2 الشغل والحرارة",
+                  "content": "العلاقة بين الشغل والحرارة في الأنظمة الحرارية.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-3 القانون الأول للديناميكيا الحرارية",
+                  "content": "نص القانون الأول وتطبيقاته.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-4 تطبيقات قانون الديناميكيا الحرارية الأول",
+                  "content": "مسائل وتطبيقات على القانون الأول.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-5 ماكنة حرارية",
+                  "content": "مبدأ عمل الماكنة الحرارية وكفاءتها.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-6 القانون الثاني في الديناميكيا الحرارية",
+                  "content": "نص القانون الثاني ومفهوم الإنتروبي.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل السابع: الحركة الدائرية والدورانية",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الحركة الدائرية",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "7-1 الحركة الدائرية",
+                  "content": "مفهوم الحركة الدائرية وخصائصها.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-2 الإزاحة الزاوية والسرعة الزاوية",
+                  "content": "الكميات الزاوية: الإزاحة والسرعة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-3 العلاقة بين الانطلاق الخطي والانطلاق الزاوي",
+                  "content": "الربط بين الكميات الخطية والزاوية.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-4 التعجيل المركزي والقوة المركزية",
+                  "content": "التعجيل المركزي والقوة المسببة له.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-5 الحركة الدائرية غير المنتظمة",
+                  "content": "خصائص الحركة الدائرية غير المنتظمة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-6 حركة المركبات على المنعطفات الأفقية",
+                  "content": "تحليل حركة المركبات على المنعطفات الأفقية.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-7 حركة المركبات على المنعطفات المائلة",
+                  "content": "تحليل حركة المركبات على المنعطفات المائلة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-8 الوزن الحقيقي والوزن الظاهري",
+                  "content": "الفرق بين الوزن الحقيقي والظاهري.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "الحركة الدورانية",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "7-9 الحركة الدورانية",
+                  "content": "مفهوم الحركة الدورانية للأجسام الصلبة.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-10 التعجيل الزاوي",
+                  "content": "تعريف التعجيل الزاوي.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-11 معادلات الحركة الزاوية ذات التعجيل الزاوي المنتظم",
+                  "content": "معادلات الحركة الدورانية بتعجيل منتظم.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-12 عزم القصور الذاتي وطاقة الدوران",
+                  "content": "عزم القصور الذاتي وطاقة الحركة الدورانية.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-13 الحركة المركبة (حركة انتقالية وحركة دورانية)",
+                  "content": "تركيب الحركة الانتقالية والدورانية.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-14 العزم المدور لجسم والتعجيل الزاوي",
+                  "content": "العلاقة بين العزم المدور والتعجيل الزاوي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-15 الشغل والقدرة في الحركة الدورانية",
+                  "content": "حساب الشغل والقدرة في الدوران.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-16 الزخم الزاوي",
+                  "content": "تعريف الزخم الزاوي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-17 قانون حفظ الزخم الزاوي",
+                  "content": "قانون حفظ الزخم الزاوي وتطبيقاته.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الثامن: الحركة الاهتزازية والموجية والصوت",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الحركة الاهتزازية",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "8-1 الحركة الدورية",
+                  "content": "مفهوم الحركة الدورية وأمثلة عليها.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-2 الحركة الاهتزازية",
+                  "content": "مفهوم الحركة الاهتزازية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-3 الحركة التوافقية البسيطة",
+                  "content": "خصائص الحركة التوافقية البسيطة.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-4 العلاقة بين الحركة الدائرية المنتظمة والحركة التوافقية البسيطة",
+                  "content": "الربط بين الحركة الدائرية والتوافقية البسيطة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-5 البندول البسيط",
+                  "content": "حركة البندول البسيط وقوانينه.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-6 الحركة التوافقية المضمحلة",
+                  "content": "مفهوم الاضمحلال في الحركة التوافقية.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "الحركة الموجية والصوت",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "8-7 الحركة الموجية",
+                  "content": "مفهوم الموجات وانتشارها.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-8 النبضات في وتر",
+                  "content": "انتشار النبضات في الأوتار.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-9 مبدأ التراكب",
+                  "content": "مبدأ تراكب الموجات.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-10 الموجات الدورية",
+                  "content": "خصائص الموجات الدورية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-11 أنواع الموجات",
+                  "content": "الموجات المستعرضة والطولية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-12 الصوت",
+                  "content": "طبيعة الصوت وانتشاره.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-13 تداخل الموجات",
+                  "content": "ظاهرة تداخل الموجات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-14 الرنين",
+                  "content": "ظاهرة الرنين وشروطها.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-15 الضربات",
+                  "content": "ظاهرة الضربات في الصوت.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-16 الموجات الواقفة",
+                  "content": "تكوّن الموجات الواقفة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-17 خصائص الصوت",
+                  "content": "شدة الصوت ودرجته ونوعه.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-18 حساب مستويات الصوت",
+                  "content": "طريقة حساب مستوى شدة الصوت.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-19 الموجات فوق السمعية",
+                  "content": "خصائص الموجات فوق السمعية واستخداماتها.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-20 تأثير دوبلر",
+                  "content": "تأثير دوبلر في الصوت.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "8-21 موجة الرجة (الموجة الصدمية)",
+                  "content": "مفهوم موجة الصدمة وتكوّنها.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل التاسع: التيار الكهربائي",
+          "pages": null,
+          "topics": [
+            {
+              "title": "التيار والمقاومة",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "9-1 التيار الكهربائي",
+                  "content": "تعريف التيار الكهربائي ووحداته.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-2 المقاومة الكهربائية وقانون أوم",
+                  "content": "قانون أوم والعلاقة بين الجهد والتيار.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-3 المقاومية ودرجة الحرارة",
+                  "content": "تأثير درجة الحرارة على المقاومية.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-4 المواد فائقة التوصيل",
+                  "content": "ظاهرة التوصيل الفائق.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-5 القوة الدافعة الكهربائية",
+                  "content": "مفهوم القوة الدافعة الكهربائية للمصدر.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-6 قانون الدائرة الكهربائية المقفلة",
+                  "content": "تطبيق قانون أوم على الدائرة المقفلة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-7 المقاومة الداخلية",
+                  "content": "تأثير المقاومة الداخلية للمصدر.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-8 القدرة الكهربائية",
+                  "content": "حساب القدرة الكهربائية المستهلكة.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "ربط المقاومات وكيرشهوف",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "9-9 ربط المقاومات على التوالي",
+                  "content": "خصائص الربط على التوالي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-10 ربط المقاومات على التوازي",
+                  "content": "خصائص الربط على التوازي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "9-11 قواعد كيرشهوف",
+                  "content": "قاعدتا كيرشهوف للتيار والجهد.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل العاشر: المغناطيسية",
+          "pages": null,
+          "topics": [
+            {
+              "title": "المجال المغناطيسي",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "10-1 المجال المغناطيسي",
+                  "content": "مفهوم المجال المغناطيسي وخطوطه.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-2 الفيض المغناطيسي وكثافة الفيض المغناطيسي",
+                  "content": "تعريف الفيض وكثافة الفيض.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-3 المجال المغناطيسي الأرضي",
+                  "content": "خصائص المجال المغناطيسي الأرضي.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-4 زاوية الميل المغناطيسي وزاوية الانحراف المغناطيسي",
+                  "content": "تعريف زاويتي الميل والانحراف.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-5 القوة المغناطيسية المؤثرة في شحنة كهربائية متحركة",
+                  "content": "حساب القوة المغناطيسية على شحنة متحركة.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-6 تأثير المجال المغناطيسي على سلك موصل حامل للتيار",
+                  "content": "القوة المؤثرة على سلك يمر فيه تيار.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-7 حركة جسيم مشحون في مجال مغناطيسي منتظم",
+                  "content": "مسار الجسيم المشحون في مجال منتظم.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            },
+            {
+              "title": "تطبيقات المغناطيسية",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "10-8 المجال المغناطيسي لسلك طويل ينساب فيه تيار كهربائي",
+                  "content": "حساب مجال سلك مستقيم طويل.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-9 القوة المتبادلة بين سلكين موصلين متوازيين ينساب فيهما تيار كهربائي",
+                  "content": "القوة بين سلكين متوازيين.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-10 المجال المغناطيسي لملف لولبي",
+                  "content": "مجال الملف اللولبي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-11 العزم المؤثر في ملف ينساب فيه تيار كهربائي موضوع في مجال مغناطيسي",
+                  "content": "عزم الدوران على ملف في مجال مغناطيسي.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "10-12 الهسترة المغناطيسية",
+                  "content": "ظاهرة الهسترة في المواد المغناطيسية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "exams": []
+    },
+    {
+      "name": "الكيمياء",
+      "description": "منهج الكيمياء للصف الخامس العلمي - المنهج العراقي",
+      "icon": "🧪",
+      "chapters": [
+        {
+          "title": "الفصل الأول: تطور المفهوم الذري",
+          "pages": null,
+          "topics": [
+            {
+              "title": "تطور المفهوم الذري",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "مراجعة الفصل الأول",
+                  "content": "راجع مفاهيم الفصل من الكتاب الرسمي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الثاني: قوى الترابط والاشكال الهندسية للجزيئات",
+          "pages": null,
+          "topics": [
+            {
+              "title": "قوى الترابط والاشكال الهندسية للجزيئات",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "مراجعة الفصل الثاني",
+                  "content": "راجع مفاهيم الفصل من الكتاب الرسمي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الثالث: الجدول الدوري",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الجدول الدوري",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "مراجعة الفصل الثالث",
+                  "content": "راجع مفاهيم الفصل من الكتاب الرسمي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الرابع: المحاليل",
+          "pages": null,
+          "topics": [
+            {
+              "title": "المحاليل",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "مراجعة الفصل الرابع",
+                  "content": "راجع مفاهيم الفصل من الكتاب الرسمي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الخامس: الحركيات الكيميائية",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الحركيات الكيميائية",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "مراجعة الفصل الخامس",
+                  "content": "راجع مفاهيم الفصل من الكتاب الرسمي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل السادس: الحوامض والقواعد والأملاح",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الحوامض والقواعد والأملاح",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "مراجعة الفصل السادس",
+                  "content": "راجع مفاهيم الفصل من الكتاب الرسمي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل السابع: كيمياء البوليميرات (اللدائن)",
+          "pages": null,
+          "topics": [
+            {
+              "title": "كيمياء البوليميرات (اللدائن)",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "مراجعة الفصل السابع",
+                  "content": "راجع مفاهيم الفصل من الكتاب الرسمي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الثامن: الهيدروكاربونات الاروماتية",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الهيدروكاربونات الاروماتية",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "مراجعة الفصل الثامن",
+                  "content": "راجع مفاهيم الفصل من الكتاب الرسمي.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "exams": []
+    },
+    {
+      "name": "علم الأحياء",
+      "description": "منهج الأحياء للصف الخامس العلمي - المنهج العراقي",
+      "icon": "🧬",
+      "chapters": [
+        {
+          "title": "الفصل الأول: التغذية والهضم",
+          "pages": null,
+          "topics": [
+            {
+              "title": "التغذية والهضم",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "1-1 مقدمة",
+                  "content": "مدخل إلى التغذية والهضم.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "1-2 التغذية في الأحياء وحيدة الخلية",
+                  "content": "طرق التغذية في الكائنات وحيدة الخلية.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "1-3 التغذية في النباتات",
+                  "content": "التغذية الذاتية وغير الذاتية في النبات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "1-4 التغذية في الحيوانات",
+                  "content": "أنماط التغذية والهضم في الحيوانات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الثاني: التنفس والتبادل الغازي",
+          "pages": null,
+          "topics": [
+            {
+              "title": "التنفس والتبادل الغازي",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "2-1 مقدمة",
+                  "content": "مدخل إلى التنفس والتبادل الغازي.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-2 التنفس الخلوي",
+                  "content": "مراحل التنفس الخلوي وإنتاج الطاقة.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-3 التنفس في النباتات",
+                  "content": "التبادل الغازي في النباتات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "2-4 التنفس في الحيوانات",
+                  "content": "أجهزة التنفس في الحيوانات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الثالث: الإخراج",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الإخراج",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "3-1 مقدمة",
+                  "content": "مدخل إلى عملية الإخراج.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-2 الإخراج في الأحياء وحيدة الخلية",
+                  "content": "الإخراج في الكائنات وحيدة الخلية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-3 الإخراج في النبات",
+                  "content": "طرق الإخراج في النباتات.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-4 الإخراج في الحيوان",
+                  "content": "أجهزة الإخراج في الحيوانات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "3-5 تنظيم درجة الحرارة",
+                  "content": "تنظيم حرارة الجسم في الكائنات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الرابع: الحركة",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الحركة",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "4-1 مقدمة",
+                  "content": "مدخل إلى الحركة في الكائنات الحية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-2 الحركة في الأحياء وحيدة الخلية",
+                  "content": "وسائل الحركة في وحيدات الخلية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-3 الحركة في النباتات",
+                  "content": "الحركات في النباتات.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "4-4 الحركة في الحيوانات",
+                  "content": "الجهاز الهيكلي والعضلي في الحيوانات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل الخامس: النقل",
+          "pages": null,
+          "topics": [
+            {
+              "title": "النقل",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "5-1 مقدمة",
+                  "content": "مدخل إلى عملية النقل.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-2 النقل في الأحياء وحيدة الخلية",
+                  "content": "النقل في الكائنات وحيدة الخلية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-3 النقل في النبات",
+                  "content": "نقل الماء والأملاح والغذاء في النبات.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "5-4 النقل في الحيوانات",
+                  "content": "جهاز الدوران في الحيوانات والإنسان.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل السادس: التنسيق العصبي والإحساس",
+          "pages": null,
+          "topics": [
+            {
+              "title": "التنسيق العصبي والإحساس",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "6-1 مقدمة",
+                  "content": "مدخل إلى التنسيق العصبي.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-2 الإحساس في الأحياء وحيدة الخلية",
+                  "content": "الاستجابة للمؤثرات في وحيدات الخلية.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-3 الإحساس في النباتات",
+                  "content": "الاستجابة للمؤثرات في النباتات.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-4 التنسيق العصبي والإحساس في الحيوانات",
+                  "content": "الجهاز العصبي في الحيوانات.",
+                  "duration": 35,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "6-5 أعضاء الحس في الحيوانات",
+                  "content": "أعضاء الحس ووظائفها.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "الفصل السابع: الهرمونات والغدد",
+          "pages": null,
+          "topics": [
+            {
+              "title": "الهرمونات والغدد",
+              "pages": null,
+              "lessons": [
+                {
+                  "title": "7-1 مقدمة",
+                  "content": "مدخل إلى الهرمونات والغدد.",
+                  "duration": 25,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-2 الهرمونات النباتية",
+                  "content": "أنواع الهرمونات النباتية ووظائفها.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-3 الهرمونات الحيوانية والبشرية",
+                  "content": "الهرمونات في الحيوان والإنسان.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                },
+                {
+                  "title": "7-4 الغدد والتنظيم الهرموني",
+                  "content": "أنواع الغدد والتنظيم الهرموني.",
+                  "duration": 30,
+                  "pageFrom": null,
+                  "pageTo": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "exams": []
+    }
+  ]
+}

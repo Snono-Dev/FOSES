@@ -63,12 +63,19 @@ export async function pSettings(el){
   const db=getDB(); const sess=getSession();
   el.innerHTML=`<h2><span class="h-ic">${icon('sliders', 20)}</span> الإعدادات</h2>
   <div class="card"><b>الحساب</b><p class="muted small">${sess?esc(sess.login||'ضيف'):''}</p>
-  <div class="row"><button class="btn ghost" id="logout">تسجيل الخروج</button><button class="btn ghost" id="sync">🔄 مزامنة الآن</button></div></div>
+  <div class="row"><button class="btn ghost" id="logout">تسجيل الخروج</button></div></div>
+  <div class="card"><b>🔄 المزامنة</b><p class="muted small" id="syncState"></p>
+  <div class="row spread"><span>المزامنة التلقائية (بعد كل تعديل)</span><button class="btn sm ghost" id="autoT"></button></div>
+  <div class="row" style="margin-top:10px"><button class="btn sm" id="syncNow">⬆️ مزامنة يدوية الآن</button></div>
+  <p class="muted small">الإيقاف يمنع الدفع التلقائي فقط — السحب عند الدخول والزر اليدوي يعملان دائمًا.</p></div>
   <div class="card"><b>المظهر</b><div class="row" style="margin-top:8px"><button class="btn ghost sm" id="th">🌙/☀️ تبديل السمة</button></div></div>
   <div class="card" id="pushCard"><b>🔔 تنبيهات الهاتف</b><div class="muted small">طبقتان مجانيتان بدون أي سيرفر مدفوع: تنبيه فوري والمتصفح مفتوح + دفع يومي عبر GitHub Actions.</div><div id="pushBody" class="muted small">جارٍ الفحص...</div></div>
   <div class="card"><b>⚠️ منطقة الخطر</b><div class="row"><button class="btn danger sm" id="wipe">تصفير البيانات المحلية</button></div></div>`;
   el.querySelector('#logout').onclick=()=>{clearSession();location.hash='#/login';location.reload();};
-  el.querySelector('#sync').onclick=async()=>{toast('جارٍ المزامنة...');await pushNow();toast('تم ✅');};
+  const paintSync=()=>{ const on=db.settings.autoSync!==false; el.querySelector('#autoT').textContent=on?'إيقاف التلقائية':'تشغيل التلقائية'; el.querySelector('#syncState').textContent='الحالة: '+(on?'تلقائية ✅':'متوقفة ⏸️ — استخدم الزر اليدوي'); };
+  paintSync();
+  el.querySelector('#autoT').onclick=()=>{ db.settings.autoSync=db.settings.autoSync===false?true:false; saveLocal(); paintSync(); toast(db.settings.autoSync!==false?'المزامنة التلقائية تعمل ✅':'المزامنة التلقائية متوقفة ⏸️'); };
+  el.querySelector('#syncNow').onclick=async()=>{ toast('جارٍ المزامنة اليدوية...'); const ok=await initialSync(); toast(ok?'تمت المزامنة ✅':'تعذر — راجع صفحة GitHub للتشخيص'); pSettings(el); };
   el.querySelector('#th').onclick=()=>document.getElementById('themeBtn').click();
   el.querySelector('#wipe').onclick=()=>{if(confirm('تصفير؟')){resetDemo();toast('تم التصفير');}};
   pushSetup(el, db);
@@ -157,24 +164,40 @@ async function pushSetup(el, db) {
 export async function pImport(el){
   const db=getDB();
   el.innerHTML=`<h2><span class="h-ic">${icon('download', 20)}</span> استيراد / تصدير</h2>
+  <div class="card"><b>⚡ استيراد سريع بدون رفع</b><p class="muted small">مناهج جاهزة داخل التطبيق أو من رابط مباشر — تُفحص قبل الاستيراد كالمعتاد.</p>
+  <div class="row"><button class="btn sm" data-quick="data/example-curriculum.json">منهج تجريبي</button><button class="btn sm ghost" data-quick="data/iraqi-5th-scientific.json">السادس العلمي (عراقي)</button></div>
+  <div class="fld-row" style="margin-top:8px"><div class="fld"><span>أو رابط JSON مباشر</span><input id="qurl" placeholder="https://.../curriculum.json" dir="ltr"></div></div>
+  <div class="row" style="margin-top:8px"><button class="btn sm ghost" id="qfetch">جلب من الرابط</button></div></div>
   <div class="card"><b>استيراد منهج (JSON)</b><p class="muted small">ارفع ملفًا بصيغة { subjects:[{name, chapters:[{title, topics:[{title, lessons:[{title}]}]}]}] } — أو ملف نسخة احتياطية كاملة.</p>
   <input type="file" id="f" accept=".json,application/json"><pre class="code" id="prev">اختر ملفًا للمعاينة والفحص...</pre><div class="row"><button class="btn" id="do" disabled>تأكيد الاستيراد</button><button class="btn ghost" id="merge">دمج بدل الاستبدال</button></div><div id="errs" class="small"></div></div>
   <div class="card"><b>نسخ احتياطي</b><div class="row"><button class="btn" id="exp">⬇️ تنزيل بياناتي (JSON)</button><button class="btn ghost" id="expsub">تصدير مادة واحدة</button></div>
   <label>استعادة من نص JSON</label><textarea id="paste" rows="4" placeholder='الصق JSON هنا...'></textarea><button class="btn ghost" id="frompaste" style="margin-top:8px">استيراد من النص</button></div>`;
   let parsed=null, isBackup=false;
+  const preview=(obj)=>{
+    parsed=obj;
+    isBackup=!!(parsed.subjects&&parsed.curriculum&&parsed.exams);
+    const v=isBackup?{ok:true,errors:[]}:validateCurriculumImport(parsed);
+    el.querySelector('#prev').textContent=JSON.stringify(parsed,null,2).slice(0,3000);
+    el.querySelector('#errs').innerHTML=v.ok?'<span class="chip">✅ صالح للاستيراد</span>':v.errors.map(x=>`<div>❌ ${esc(x)}</div>`).join('');
+    el.querySelector('#do').disabled=!v.ok;
+    el.querySelector('#prev').scrollIntoView({block:'nearest'});
+    toast(v.ok?'جاهز — راجع ثم أكّد الاستيراد ✅':'راجع الأخطاء ❌');
+  };
+  el.querySelectorAll('[data-quick]').forEach(b=>b.onclick=async()=>{
+    try{ const r=await fetch('./'+b.dataset.quick); if(!r.ok) throw 0; preview(await r.json()); }
+    catch{ toast('تعذر الجلب'); }
+  });
+  el.querySelector('#qfetch').onclick=async()=>{
+    const u=el.querySelector('#qurl').value.trim(); if(!u) return toast('الصق الرابط');
+    try{ const r=await fetch(u); if(!r.ok) throw 0; preview(await r.json()); }
+    catch{ toast('تعذر الجلب — تحقق من الرابط (قد يمنع CORS)'); }
+  };
   el.querySelector('#f').onchange=e=>{
     const file=e.target.files[0]; if(!file) return;
     const rd=new FileReader();
     rd.onload=()=>{
-      try{
-        parsed=JSON.parse(rd.result);
-        isBackup=!!(parsed.subjects&&parsed.curriculum&&parsed.exams);
-        const toCheck=isBackup?{subjects:Object.entries(parsed.curriculum||{}).map(()=>({name:'x'}))}:parsed;
-        const v=isBackup?{ok:true,errors:[]}:validateCurriculumImport(parsed);
-        el.querySelector('#prev').textContent=JSON.stringify(parsed,null,2).slice(0,3000);
-        el.querySelector('#errs').innerHTML=v.ok?'<span class="chip">✅ صالح للاستيراد</span>':v.errors.map(x=>`<div>❌ ${esc(x)}</div>`).join('');
-        el.querySelector('#do').disabled=!v.ok;
-      }catch{ el.querySelector('#errs').textContent='❌ ملف JSON غير صالح'; }
+      try{ preview(JSON.parse(rd.result)); }
+      catch{ el.querySelector('#errs').textContent='❌ ملف JSON غير صالح'; }
     };
     rd.readAsText(file);
   };

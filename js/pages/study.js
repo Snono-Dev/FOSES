@@ -1,7 +1,7 @@
 import { getDB, saveLocal } from '../store.js';
 import { esc, uid, now } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
-import { touchActivity, pagesLabel } from '../models.js';
+import { touchActivity, pagesLabel, lectureLabel } from '../models.js';
 import { subjColor } from '../components.js';
 import { icon } from '../icons.js';
 
@@ -51,28 +51,53 @@ export async function pSubjects(el){
   });
 }
 
+let editCh = null, editTp = null;
+
 export async function pSubject(el,id){
   const db=getDB(); const s=db.subjects.find(x=>x.id===id);
   if(!s){ el.innerHTML='<div class="card">المادة غير موجودة</div>'; return; }
   const cur=db.curriculum[id]||{chapters:[]};
   el.innerHTML=`<a href="#/subjects">← المواد</a><h2>${esc(s.icon)} ${esc(s.name)}</h2>
-  <div class="row"><button class="btn sm" id="addCh">+ فصل</button><a class="btn sm ghost" href="#/exams">الامتحانات</a></div>
-  ${cur.chapters.map(c=>`<div class="card"><div class="row spread"><input class="ch-title" data-cht="${c.id}" value="${esc(c.title)}" placeholder="اسم الفصل"><span class="chip">${(c.topics||[]).reduce((a,t)=>a+(t.lessons||[]).length,0)} درسًا</span></div>
-    <div class="fld-row" style="margin-top:8px"><div class="fld"><span>📄 من صفحة (الفصل)</span><input data-chf="${c.id}" type="number" placeholder="مثال: 5" value="${c.pageFrom||''}"></div><div class="fld"><span>📄 إلى صفحة (الفصل)</span><input data-cht="${c.id}" type="number" placeholder="مثال: 20" value="${c.pageTo||''}"></div></div>
-    ${(c.topics||[]).map(tp=>`<div class="list-item"><span>📁</span><div style="flex:1"><input class="tp-title" data-tpt="${tp.id}" value="${esc(tp.title)}" placeholder="اسم الموضوع"><div class="muted small">${(tp.lessons||[]).filter(l=>l.completed).length}/${(tp.lessons||[]).length} مكتمل${pagesLabel(tp.pageFrom,tp.pageTo)?' · '+pagesLabel(tp.pageFrom,tp.pageTo):''}</div><div class="fld-row" style="margin-top:6px"><div class="fld"><span>📄 من صفحة (الموضوع)</span><input data-tpf="${tp.id}" type="number" placeholder="مثال: 7" value="${tp.pageFrom||''}"></div><div class="fld"><span>📄 إلى صفحة (الموضوع)</span><input data-tpt="${tp.id}" type="number" placeholder="مثال: 7" value="${tp.pageTo||''}"></div></div></div><a class="btn sm ghost" href="#/topic/${s.id}/${c.id}/${tp.id}">فتح</a></div>`).join('')}
-    <div class="row"><button class="btn sm ghost" data-addtp="${c.id}">+ موضوع</button><button class="btn sm ghost" data-delch="${c.id}">حذف الفصل</button></div>
+  <div class="row"><button class="btn sm" id="addCh"><span class="ic">${icon('plus', 15)}</span> فصل</button><a class="btn sm ghost" href="#/exams">الامتحانات</a></div>
+  ${cur.chapters.map(c=>`<div class="card">
+    ${editCh===c.id ? `
+    <label>اسم الفصل</label><input id="echT" value="${esc(c.title)}">
+    <div class="fld-row"><div class="fld"><span>📄 من صفحة</span><input id="echF" type="number" value="${c.pageFrom||''}"></div>
+    <div class="fld"><span>📄 إلى صفحة</span><input id="echTo" type="number" value="${c.pageTo||''}"></div></div>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-sch="${c.id}"><span class="ic">${icon('check', 15)}</span> حفظ</button><button class="btn sm ghost" data-cch="${c.id}">إلغاء</button></div>`
+    : `<div class="row spread"><b style="font-size:16px">${esc(c.title)}</b><span class="row"><span class="chip">${(c.topics||[]).reduce((a,t)=>a+(t.lessons||[]).length,0)} درسًا</span><button class="btn sm ghost" data-ech="${c.id}" title="تحرير الفصل"><span class="ic">${icon('pencil', 15)}</span></button></span></div>
+    ${pagesLabel(c.pageFrom,c.pageTo)?`<div><span class="chip">${pagesLabel(c.pageFrom,c.pageTo)}</span></div>`:''}`}
+    ${(c.topics||[]).map(tp=> editTp===tp.id ? `
+    <div class="card" style="background:var(--card2)"><label>اسم الموضوع</label><input id="etpT" value="${esc(tp.title)}">
+    <div class="fld-row"><div class="fld"><span>📄 من صفحة</span><input id="etpF" type="number" value="${tp.pageFrom||''}"></div>
+    <div class="fld"><span>📄 إلى صفحة</span><input id="etpTo" type="number" value="${tp.pageTo||''}"></div></div>
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-stp="${tp.id}"><span class="ic">${icon('check', 15)}</span> حفظ</button><button class="btn sm ghost" data-ctp="${tp.id}">إلغاء</button></div></div>`
+    : `<div class="list-item"><span>📁</span><div style="flex:1"><b>${esc(tp.title)}</b><div class="muted small">${(tp.lessons||[]).filter(l=>l.completed).length}/${(tp.lessons||[]).length} مكتمل${pagesLabel(tp.pageFrom,tp.pageTo)?' · '+pagesLabel(tp.pageFrom,tp.pageTo):''}</div></div>
+    <button class="btn sm ghost" data-etp="${tp.id}" title="تحرير الموضوع"><span class="ic">${icon('pencil', 15)}</span></button>
+    <a class="btn sm ghost" href="#/topic/${s.id}/${c.id}/${tp.id}">فتح</a></div>`).join('')}
+    <div class="row"><button class="btn sm ghost" data-addtp="${c.id}"><span class="ic">${icon('plus', 15)}</span> موضوع</button><button class="btn sm ghost" data-delch="${c.id}"><span class="ic">${icon('trash', 15)}</span> حذف الفصل</button></div>
     ${(()=>{ const all=[]; (c.topics||[]).forEach(t=>(t.lessons||[]).forEach(l=>all.push({t,l}))); const dn=all.filter(x=>x.l.completed);
       return `<details class="done-box"><summary>✅ الدروس التي أخذتها في هذا الفصل (${dn.length}/${all.length})</summary>`
       + (dn.length?dn.map(x=>`<a class="list-item" href="#/lesson/${s.id}/${c.id}/${x.t.id}/${x.l.id}"><span>✅</span><div><b>${esc(x.l.title)}</b><div class="muted small">${esc(x.t.title)}${pagesLabel(x.l.pageFrom,x.l.pageTo)?' · '+pagesLabel(x.l.pageFrom,x.l.pageTo):''}</div></div></a>`).join(''):'<p class="muted small">لم تُنجز دروسًا هنا بعد.</p>') + `</details>`; })()}</div>`).join('')||'<div class="card muted">لا فصول بعد.</div>'}`;
   el.querySelector('#addCh').onclick=()=>{ cur.chapters.push({id:uid('ch'),title:`فصل ${cur.chapters.length+1}`,pageFrom:null,pageTo:null,topics:[]}); saveLocal(); pSubject(el,id); };
-  el.querySelectorAll('.ch-title').forEach(i=>i.onchange=()=>{ const c=cur.chapters.find(x=>x.id===i.dataset.cht); if(!c||!i.value.trim()){pSubject(el,id);return;} c.title=i.value.trim(); saveLocal(); toast('حُفظ الاسم ✏️'); });
-  el.querySelectorAll('.tp-title').forEach(i=>i.onchange=()=>{ const tp=findTopic(cur,i.dataset.tpt); if(!tp||!i.value.trim()){pSubject(el,id);return;} tp.title=i.value.trim(); saveLocal(); toast('حُفظ الاسم ✏️'); });
+  el.querySelectorAll('[data-ech]').forEach(b=>b.onclick=()=>{ editCh=b.dataset.ech; editTp=null; pSubject(el,id); });
+  el.querySelectorAll('[data-cch]').forEach(b=>b.onclick=()=>{ editCh=null; pSubject(el,id); });
+  el.querySelectorAll('[data-sch]').forEach(b=>b.onclick=()=>{
+    const c=cur.chapters.find(x=>x.id===b.dataset.sch); if(!c) return;
+    const t=el.querySelector('#echT').value.trim(); if(t) c.title=t;
+    c.pageFrom=+el.querySelector('#echF').value||null; c.pageTo=+el.querySelector('#echTo').value||c.pageFrom;
+    editCh=null; saveLocal(); toast('حُفظ الفصل ✅'); pSubject(el,id);
+  });
   el.querySelectorAll('[data-addtp]').forEach(b=>b.onclick=()=>{ const c=cur.chapters.find(x=>x.id===b.dataset.addtp); c.topics.push({id:uid('tp'),title:'موضوع جديد',pageFrom:null,pageTo:null,lessons:[]}); saveLocal(); pSubject(el,id); });
-  el.querySelectorAll('[data-tpf]').forEach(i=>i.onchange=()=>{ const tp=findTopic(cur,i.dataset.tpf); if(!tp)return; tp.pageFrom=+i.value||null; if(tp.pageTo&&tp.pageFrom&&tp.pageTo<tp.pageFrom)tp.pageTo=tp.pageFrom; saveLocal(); toast('حُفظت صفحات الموضوع 📄'); });
-  el.querySelectorAll('[data-tpt]').forEach(i=>i.onchange=()=>{ const tp=findTopic(cur,i.dataset.tpt); if(!tp)return; tp.pageTo=+i.value||tp.pageFrom; saveLocal(); toast('حُفظت صفحات الموضوع 📄'); });
+  el.querySelectorAll('[data-etp]').forEach(b=>b.onclick=()=>{ editTp=b.dataset.etp; editCh=null; pSubject(el,id); });
+  el.querySelectorAll('[data-ctp]').forEach(b=>b.onclick=()=>{ editTp=null; pSubject(el,id); });
+  el.querySelectorAll('[data-stp]').forEach(b=>b.onclick=()=>{
+    const tp=findTopic(cur,b.dataset.stp); if(!tp) return;
+    const t=el.querySelector('#etpT').value.trim(); if(t) tp.title=t;
+    tp.pageFrom=+el.querySelector('#etpF').value||null; tp.pageTo=+el.querySelector('#etpTo').value||tp.pageFrom;
+    editTp=null; saveLocal(); toast('حُفظ الموضوع ✅'); pSubject(el,id);
+  });
   el.querySelectorAll('[data-delch]').forEach(b=>b.onclick=()=>{ if(!confirm('حذف الفصل؟'))return; cur.chapters=cur.chapters.filter(x=>x.id!==b.dataset.delch); saveLocal(); pSubject(el,id); });
-  el.querySelectorAll('[data-chf]').forEach(i=>i.onchange=()=>{ const c=cur.chapters.find(x=>x.id===i.dataset.chf); c.pageFrom=+i.value||null; if(c.pageTo&&c.pageFrom&&c.pageTo<c.pageFrom)c.pageTo=c.pageFrom; saveLocal(); toast('حُفظت الصفحات 📄'); });
-  el.querySelectorAll('[data-cht]').forEach(i=>i.onchange=()=>{ const c=cur.chapters.find(x=>x.id===i.dataset.cht); c.pageTo=+i.value||c.pageFrom; saveLocal(); toast('حُفظت الصفحات 📄'); });
 }
 
 function findTopic(cur, tid){
@@ -98,10 +123,12 @@ export async function pLesson(el,sid,cid,tid,lid){
   if(!l){ el.innerHTML='<div class="card">الدرس غير موجود</div>'; return; }
   el.innerHTML=`<a href="#/topic/${sid}/${cid}/${tid}">← رجوع</a>
   <div class="card"><h2>${l.completed?'✅':''} ${esc(l.title)} ${l.favorite?'⭐':''}</h2>
-  ${pagesLabel(l.pageFrom,l.pageTo)?`<div><span class="chip">${pagesLabel(l.pageFrom,l.pageTo)}</span></div>`:''}
+  ${pagesLabel(l.pageFrom,l.pageTo)||lectureLabel(l)?`<div class="row">${pagesLabel(l.pageFrom,l.pageTo)?`<span class="chip">${pagesLabel(l.pageFrom,l.pageTo)}</span>`:''}${lectureLabel(l)?`<span class="chip">${lectureLabel(l)}</span>`:''}</div>`:''}
   <p class="muted">${esc(l.desc||'')}</p>
   <div class="card" style="background:var(--card2)">${esc(l.content||'لا محتوى بعد — أضف شرح الدرس أدناه.')}</div>
   <label>عنوان الدرس</label><input id="ltitle" value="${esc(l.title)}" placeholder="مثال: الدرس الأول — المقدمة">
+  <div class="fld-row"><div class="fld"><span>رقم المحاضرة (اختياري — امسحه للإزالة)</span><input id="llec" type="number" placeholder="تلقائي" value="${l.lectureNo ?? ''}"></div>
+  <div class="fld"><span>تاريخ الإضافة (تلقائي)</span><input value="${esc((l.createdAt || '').slice(0, 10))}" disabled></div></div>
   <label>المدة (دقيقة)</label><input id="dur" type="number" value="${l.duration||30}">
   <label>المحتوى</label><textarea id="content" rows="5">${esc(l.content||'')}</textarea>
   <label>ملاحظاتي</label><textarea id="notes" rows="3">${esc(l.notes||'')}</textarea>
@@ -114,7 +141,7 @@ export async function pLesson(el,sid,cid,tid,lid){
     <button class="btn ghost" id="fav"><span class="ic">${icon('star', 16)}</span> ${l.favorite ? 'إزالة من المفضلة' : 'مفضلة'}</button>
     <button class="btn ghost" id="save"><span class="ic">${icon('check', 16)}</span> حفظ</button>
   </div></div>`;
-  const save=()=>{ l.title=el.querySelector('#ltitle').value.trim()||l.title; l.duration=+el.querySelector('#dur').value||30; l.content=el.querySelector('#content').value; l.notes=el.querySelector('#notes').value; l.remindAt=el.querySelector('#remind').value||null; l.pageFrom=+el.querySelector('#pfrom').value||null; l.pageTo=+el.querySelector('#pto').value||l.pageFrom; saveLocal(); toast('تم الحفظ 💾'); };
+  const save=()=>{ l.title=el.querySelector('#ltitle').value.trim()||l.title; l.lectureNo=el.querySelector('#llec').value==='' ? null : +el.querySelector('#llec').value; l.duration=+el.querySelector('#dur').value||30; l.content=el.querySelector('#content').value; l.notes=el.querySelector('#notes').value; l.remindAt=el.querySelector('#remind').value||null; l.pageFrom=+el.querySelector('#pfrom').value||null; l.pageTo=+el.querySelector('#pto').value||l.pageFrom; saveLocal(); toast('تم الحفظ 💾'); };
   el.querySelector('#save').onclick=save;
   el.querySelector('#norem') && (el.querySelector('#norem').onclick=()=>{ l.remindAt=null; saveLocal(); pLesson(el,sid,cid,tid,lid); });
   el.querySelector('#fav').onclick=()=>{ l.favorite=!l.favorite; saveLocal(); pLesson(el,sid,cid,tid,lid); };

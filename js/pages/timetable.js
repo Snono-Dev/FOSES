@@ -27,11 +27,28 @@ export async function pTimetable(el) {
     box.innerHTML = list.length ? list.map((e, i) => {
       const s = db.subjects.find(x => x.id === e.subjectId);
       return `<div class="list-item"><span>${esc(s?.icon || '🏫')}</span><div style="flex:1"><b>${esc(s?.name || '؟')}</b>${e.time ? `<div class="muted small">${esc(e.time)}</div>` : ''}</div>
-      <a class="btn sm ghost" href="#/subject/${e.subjectId}">فتح</a><button class="btn sm ghost" data-ttdel="${d}:${i}"><span class="ic">${icon('trash', 15)}</span></button></div>`;
+      <span class="row" style="gap:2px"><button class="icon-btn" data-ttup="${d}:${i}" title="تحريك لأعلى" ${i === 0 ? 'disabled style="opacity:.35"' : ''}>▲</button><button class="icon-btn" data-ttdn="${d}:${i}" title="تحريك لأسفل" ${i === list.length - 1 ? 'disabled style="opacity:.35"' : ''}>▼</button></span>
+      <select data-ttmv="${d}:${i}" title="نقل ليوم آخر" style="max-width:108px">${DAY_ORDER.map(dd => `<option value="${dd}" ${dd === d ? 'selected' : ''}>${DAY_NAMES[dd]}</option>`).join('')}</select>
+      <button class="btn sm ghost" data-ttdel="${d}:${i}"><span class="ic">${icon('trash', 15)}</span></button></div>`;
     }).join('') : '<p class="muted small">يوم فارغ.</p>';
     box.querySelectorAll('[data-ttdel]').forEach(b => b.onclick = () => {
       const [dd, i] = b.dataset.ttdel.split(':');
       db.timetable[dd].splice(+i, 1); saveLocal(); drawDay(+dd); refreshCounts();
+    });
+    box.querySelectorAll('[data-ttup]').forEach(b => b.onclick = () => {
+      const [dd, i] = b.dataset.ttup.split(':'); const a = db.timetable[dd]; const j = +i;
+      if (j <= 0) return; const t = a[j - 1]; a[j - 1] = a[j]; a[j] = t; saveLocal(); drawDay(+dd);
+    });
+    box.querySelectorAll('[data-ttdn]').forEach(b => b.onclick = () => {
+      const [dd, i] = b.dataset.ttdn.split(':'); const a = db.timetable[dd]; const j = +i;
+      if (j >= a.length - 1) return; const t = a[j + 1]; a[j + 1] = a[j]; a[j] = t; saveLocal(); drawDay(+dd);
+    });
+    box.querySelectorAll('[data-ttmv]').forEach(sel => sel.onchange = () => {
+      const [dd, i] = sel.dataset.ttmv.split(':'); const to = +sel.value;
+      if (to === +dd) return;
+      const mv = db.timetable[dd].splice(+i, 1)[0];
+      db.timetable[to] = db.timetable[to] || []; db.timetable[to].push(mv);
+      saveLocal(); pTimetable(el); toast(`نُقلت إلى ${DAY_NAMES[to]} ✅`);
     });
   };
   const refreshCounts = () => pTimetable(el);

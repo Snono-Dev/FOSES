@@ -2,7 +2,8 @@
 import { getDB, saveLocal } from '../store.js';
 import { esc, uid, now } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
-import { touchActivity, pagesLabel } from '../models.js';
+import { touchActivity, pagesLabel, lectureLabel } from '../models.js';
+import { subjBadge } from '../components.js';
 import { icon } from '../icons.js';
 import { LS } from '../storage.js';
 
@@ -54,7 +55,8 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
       <div class="fld"><span>المادة</span><select id="mns"></select></div>
       <div class="fld"><span>الفصل</span><select id="mnc"></select></div>
       <div class="fld"><span>الموضوع</span><select id="mnt"></select></div>
-      <div class="fld"><span>عنوان الدرس</span><input id="mntitle" placeholder="مثال: الدرس الأول"></div>
+      <div class="fld"><span>عنوان الدرس (اسم المادة)</span><input id="mntitle" placeholder="اسم المادة"></div>
+      <div class="fld"><span>رقم المحاضرة (تلقائي — قابل للتغيير)</span><input id="mnlec" type="number" placeholder="تلقائي"></div>
       <div class="fld"><span>المدة (دقيقة)</span><input id="mndur" type="number" value="30"></div>
       <div class="fld"><span>من صفحة (اختياري)</span><input id="mnpf" type="number" placeholder="مثال: 5"></div>
       <div class="fld"><span>إلى صفحة (اختياري)</span><input id="mnpt" type="number" placeholder="مثال: 9"></div>
@@ -69,19 +71,33 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
     if (st.cid) g('mnc').value = st.cid;
     fT(g('mns').value, g('mnc').value);
     if (st.tid) g('mnt').value = st.tid;
-    g('mns').onchange = e => { fC(e.target.value); fT(e.target.value, g('mnc').value); };
-    g('mnc').onchange = e => fT(g('mns').value, e.target.value);
+    let lastAutoTitle = '';
+    const subjName = sid => db.subjects.find(s => s.id === sid)?.name || '';
+    const fillTitle = () => {
+      const nm = subjName(g('mns').value);
+      if (!g('mntitle').value.trim() || g('mntitle').value.trim() === lastAutoTitle) { g('mntitle').value = nm; lastAutoTitle = nm; }
+    };
+    const nextLec = () => {
+      const tp = topicsOf(g('mns').value, g('mnc').value).find(t => t.id === g('mnt').value);
+      const nums = (tp?.lessons || []).map(l => +l.lectureNo).filter(n => !isNaN(n));
+      return nums.length ? Math.max(...nums) + 1 : 1;
+    };
+    const fillLec = () => { if (!g('mnlec').value) g('mnlec').value = nextLec(); };
+    fillTitle(); fillLec();
+    g('mns').onchange = e => { fC(e.target.value); fT(e.target.value, g('mnc').value); fillTitle(); fillLec(); };
+    g('mnc').onchange = e => { fT(g('mns').value, e.target.value); fillLec(); };
+    g('mnt').onchange = () => fillLec();
     g('mcancel').onclick = () => closeModal();
     g('mok').onclick = () => {
       const sid = g('mns').value, cid = g('mnc').value, tid = g('mnt').value;
-      const title = g('mntitle').value.trim();
+      const title = g('mntitle').value.trim() || subjName(sid);
       if (!sid || !cid || !tid) return toast('اختر المادة والفصل والموضوع');
-      if (!title) return toast('أدخل عنوان الدرس');
       const tp = topicsOf(sid, cid).find(t => t.id === tid); if (!tp) return toast('الموضوع غير موجود');
       const pf = +g('mnpf').value || null;
-      tp.lessons.push({ id: uid('ls'), title, desc: '', content: '', duration: +g('mndur').value || 30, pageFrom: pf, pageTo: +g('mnpt').value || pf, remindAt: g('mnrem').value || null, completed: false, favorite: false, notes: '', lastStudied: null, createdAt: now() });
+      const lec = g('mnlec').value === '' ? nextLec() : +g('mnlec').value;
+      tp.lessons.push({ id: uid('ls'), title, desc: '', content: '', duration: +g('mndur').value || 30, pageFrom: pf, pageTo: +g('mnpt').value || pf, lectureNo: lec, remindAt: g('mnrem').value || null, completed: false, favorite: false, notes: '', lastStudied: null, createdAt: now() });
       saveLocal(); closeModal();
-      st.sid = ''; st.cid = ''; st.tid = ''; saveFilter(); syncFilters(); drawList(); toast('أُضيف الدرس ✅');
+      st.sid = ''; st.cid = ''; st.tid = ''; saveFilter(); syncFilters(); drawList(); toast(`أُضيفت المحاضرة ${lec} ✅`);
     };
   };
   // التصفية
@@ -117,8 +133,9 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
     if (fc) { if (n) { fc.textContent = n; fc.classList.remove('hidden'); } else fc.classList.add('hidden'); }
     el.querySelector('#llist').innerHTML = rows.length ? `<p class="muted small">${rows.length} درس</p>` + rows.map(n => `
       <div class="list-item"><button class="icon-btn" data-done="${n.l.id}" title="إنجاز">${n.l.completed ? icon('checkCircle', 20) : icon('circle', 20)}</button>
-      <div style="flex:1"><b>${esc(n.l.title)}</b>
-      <div class="muted small">${esc(n.s.name)} · ${esc(n.c.title)} · ${esc(n.t.title)}${pagesLabel(n.l.pageFrom, n.l.pageTo) ? ' · ' + pagesLabel(n.l.pageFrom, n.l.pageTo) : ''}${n.l.remindAt ? ' · 🔔 ' + esc(n.l.remindAt) : ''}</div></div>
+      <div style="flex:1"><b>${esc(n.l.title)}${lectureLabel(n.l) ? ' · ' + lectureLabel(n.l) : ''}</b>
+      <div style="margin:4px 0">${subjBadge(db, n.s.id)}</div>
+      <div class="muted small">${esc(n.c.title)} · ${esc(n.t.title)}${pagesLabel(n.l.pageFrom, n.l.pageTo) ? ' · ' + pagesLabel(n.l.pageFrom, n.l.pageTo) : ''}${n.l.remindAt ? ' · 🔔 ' + esc(n.l.remindAt) : ''}${n.l.createdAt ? ' · أُضيف ' + esc(n.l.createdAt.slice(0, 10)) : ''}</div></div>
       <a class="btn sm ghost" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}">فتح</a>
       <button class="btn sm ghost" data-del="${n.l.id}"><span class="ic">${icon('trash', 15)}</span></button></div>`).join('')
       : '<div class="card muted">لا دروس مطابقة — غيّر التصفية أو أضف درسًا بالأعلى.</div>';

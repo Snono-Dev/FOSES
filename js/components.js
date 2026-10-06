@@ -5,6 +5,14 @@ import { getSession, getToken } from './auth.js';
 
 export const SUBJ_COLORS = ['#4F7CFF', '#22D3A6', '#F59E0B', '#F05252', '#10B981', '#8B7CFF'];
 export const subjColor = (s, i) => s?.color || SUBJ_COLORS[(i ?? 0) % SUBJ_COLORS.length];
+// شارة المادة بلونها — لرؤيتها بسهولة داخل بطاقات الدروس
+export function subjBadge(db, sid) {
+  const subs = db.subjects || [];
+  const s = subs.find(x => x.id === sid);
+  if (!s) return '';
+  const col = subjColor(s, subs.indexOf(s));
+  return `<span class="chip subj-badge" style="--ac:${col}">${esc(s.icon || '')} ${esc(s.name)}</span>`;
+}
 
 export function ring(pct, color = '#4F7CFF', size = 72, stroke = 8, label = null) {
   pct = Math.max(0, Math.min(100, Math.round(pct)));

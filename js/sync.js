@@ -4,16 +4,30 @@ import { pullAll, pushAll, ensureDataRepo, readFile } from './github.js';
 import { getToken, getSession, updateSession } from './auth.js';
 import { CONFIG } from './config.js';
 import { normalizeExams, ensureTimetable } from './models.js';
+import { modal, closeModal } from './ui.js';
 
 let shas={};
 let timer=null, syncing=false, lastStatus='local', lastError='';
 const subs=new Set();
 export const onSync=s=>{subs.add(s);return()=>subs.delete(s)};
 function setStatus(st,msg){ lastStatus=st; if(st==='error'&&msg)lastError=msg; if(st!=='error')lastError=''; subs.forEach(f=>{try{f(st,msg)}catch{}}); paintDot(st); }
-function paintDot(st){ const d=document.getElementById('syncDot'); if(!d) return; d.className='sync-dot'+(st==='synced'?'':st==='local'?' off':' err'); d.title='sync: '+st+(st==='error'&&lastError?' — '+lastError:''); }
+function paintDot(st){ const d=document.getElementById('syncDot'); if(!d) return; const paused=!autoSyncOn()&&(st==='local'); d.className='sync-dot'+(st==='synced'?'':st==='local'?(paused?' paused':' off'):' err'); d.title='sync: '+st+(paused?' (التلقائية متوقفة)':'')+(st==='error'&&lastError?' — '+lastError:''); }
 export const syncStatus=()=>lastStatus;
 export const lastSyncError=()=>lastError;
 export const getShas=()=>shas;
+export function autoSyncOn(){ try{ return getDB()?.settings?.autoSync!==false; }catch{ return true; } }
+function hasLocalData(db){ return !!((db.subjects||[]).length||(db.exams||[]).length||(db.sessions||[]).length||(db.events||[]).length); }
+function sameJSON(a,b){ try{ return JSON.stringify(a??null)===JSON.stringify(b??null); }catch{ return false; } }
+function askDirection(){
+  return new Promise(res=>{
+    modal(`<h3>📦 المستودع فيه بيانات مختلفة</h3>
+    <p class="muted small">مستودعك على GitHub فيه بيانات، وجهازك فيه بيانات أخرى مختلفة. اختر:</p>
+    <div class="grid cols2"><button class="btn" id="dPull">⬇️ سحب بيانات المستودع واستخدامها</button>
+    <button class="btn ghost" id="dPush">⬆️ الكتابة عليها ببيانات جهازي ثم المتابعة</button></div>`);
+    document.getElementById('dPull').onclick=()=>{closeModal();res('pull');};
+    document.getElementById('dPush').onclick=()=>{closeModal();res('push');};
+  });
+}
 
 export async function initialSync(){
   const tok=getToken(), sess=getSession();
@@ -31,10 +45,24 @@ export async function initialSync(){
     shas=newShas;
     if(Object.keys(out).length){
       const db=getDB();
+      const localHas=hasLocalData(db);
+      const remoteHas=Object.values(out).some(v=>Array.isArray(v)?v.length:(v&&typeof v==='object'&&Object.keys(v).length>0));
+      if(localHas&&remoteHas){
+        const same=Object.keys(out).every(k=>sameJSON(db[k],out[k]));
+        if(!same){
+          const choice=await askDirection();
+          shas=newShas;
+          if(choice==='push'){
+            await pushNow('📚 fos: overwrite from this device');
+            setStatus('synced'); return true;
+          }
+        }
+      }
       for(const [k,v] of Object.entries(out)){ if(v!==undefined) db[k]=v; }
       normalizeExams(db);
       ensureTimetable(db);
       const { saveLocal }=await import('./store.js'); saveLocal();
+      clearTimeout(timer); // لا تدفع ما سُحب للتو كـ commit ضجيج
     } else {
       await pushNow('init 🌱 تهيئة مخزن الدراسة');
     }
@@ -44,6 +72,7 @@ export async function initialSync(){
 
 export function schedulePush(){
   const tok=getToken(); if(!tok){ setStatus('local'); return; }
+  if(!autoSyncOn()){ setStatus('local'); paintDot('local'); return; }
   setStatus('local');
   clearTimeout(timer); timer=setTimeout(()=>pushNow().catch(()=>{}), 2500);
 }
@@ -61,4 +90,4 @@ export async function pushNow(msg='📚 fos: sync'){
 }
 
 window.addEventListener('foses-dirty', ()=>schedulePush());
-window.addEventListener('online', ()=>pushNow('📚 fos: reconnect sync'));
+window.addEventListener('online', ()=>{ if(autoSyncOn()) pushNow('📚 fos: reconnect sync'); });

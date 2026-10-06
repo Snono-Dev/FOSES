@@ -15,6 +15,9 @@ export function pagesLabel(pf, pt) {
   if (pf && pt && pf !== pt) return `📄 ص ${pf}–${pt}`;
   return `📄 ص ${pf || pt}`;
 }
+export function lectureLabel(l) {
+  return (l && l.lectureNo != null && l.lectureNo !== '') ? `المحاضرة ${l.lectureNo}` : '';
+}
 
 // ---------- الجدول المدرسي الأسبوعي ----------
 // timetable: {dayNum(0=الأحد..6=السبت) -> [{subjectId,time}]}
@@ -101,6 +104,7 @@ export function normalizeImport(obj){
           return { id:l.id||`ls-${si}-${ci}-${ti}-${li}`, title:l.title||`درس ${li+1}`,
           desc:l.description||l.desc||'', content:l.content||'', duration:l.duration||30,
           pageFrom:lp.pageFrom, pageTo:lp.pageTo,
+          lectureNo:(l.lectureNo ?? l.lecture ?? l.lectureNumber ?? null),
           completed:false, favorite:false, notes:'', lastStudied:null };
         })
       };
@@ -149,14 +153,17 @@ export function normalizeImport(obj){
 }
 
 export function computeStats(db){
-  let total=0, done=0;
+  let total=0, done=0, subjectsDone=0;
   const perSubject={};
   for(const s of db.subjects){
     const cur=db.curriculum[s.id]; let t=0,d=0;
     (cur?.chapters||[]).forEach(c=>(c.topics||[]).forEach(tp=>(tp.lessons||[]).forEach(l=>{t++;total++;if(l.completed){d++;done++;}})));
-    perSubject[s.id]={total:t,done:d,pct:t?Math.round(d/t*100):0};
+    perSubject[s.id]={total:t,done:d,pct:t?Math.round(d/t*100):0,finished:t>0&&d===t};
+    if(t>0&&d===t) subjectsDone++;
   }
-  return { total, done, left:total-done, pct: total?Math.round(done/total*100):0, perSubject };
+  const st=Object.keys(perSubject).length;
+  return { total, done, left:total-done, pct: total?Math.round(done/total*100):0, perSubject,
+    subjectsTotal:st, subjectsDone, subjectsPct: st?Math.round(subjectsDone/st*100):0 };
 }
 
 export function levelFor(xp){

@@ -3,6 +3,7 @@ import { computeStats, levelFor, touchActivity, nextLessons, examScopeLabel, day
 import { esc, uid, now } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
 import { icon } from '../icons.js';
+import { subjBadge } from '../components.js';
 
 // ---- Progress ----
 export async function pProgress(el){
@@ -11,6 +12,8 @@ export async function pProgress(el){
   <div class="card"><div class="row spread"><b>المستوى ${lv.level}</b><span class="chip">${lv.current}/${lv.need} XP</span></div>
   <div class="progress" style="margin-top:8px"><i style="width:${Math.round(lv.current/lv.need*100)}%"></i></div>
   <p class="muted small">نقاط الخبرة من: إكمال درس +50 · إنجاز تذكير امتحان +30 · كل دقيقة دراسة +2</p></div>
+  <div class="card"><b>🎓 إنهاء المواد ${st.subjectsDone}/${st.subjectsTotal} (${st.subjectsPct}%)</b><div class="progress" style="margin:8px 0"><i style="width:${st.subjectsPct}%"></i></div>
+  <p class="muted small">المادة تُحسب منجزة عند إكمال كل دروسها.</p></div>
   <div class="card"><b>الإنجاز العام ${st.pct}%</b><div class="progress" style="margin:8px 0"><i style="width:${st.pct}%"></i></div>
   ${Object.entries(st.perSubject).map(([sid,p])=>{const s=db.subjects.find(x=>x.id===sid);return `<div class="bar-row"><span>${esc(s?.icon||'📘')} ${esc(s?.name||sid)}</span><div class="progress"><i style="width:${p.pct}%"></i></div><b>${p.pct}%</b></div>`}).join('')}</div>
   <div class="card"><b>🏅 الإنجازات (${db.achievements.length})</b>${db.achievements.map(a=>`<div class="list-item"><span>🏅</span><div><b>${esc(a.title)}</b><div class="muted small">${esc(a.at?.slice(0,10)||'')}</div></div></div>`).join('')||'<p class="muted">أكمل الدروس والامتحانات لفتح الشارات.</p>'}</div>
@@ -57,19 +60,21 @@ export async function pCalendar(el){
   // أحداث تلقائية: تذكيرات الامتحانات + تذكيرات الدروس (بدون إضافة يدوية)
   const autoExams=(db.exams||[]).filter(e=>e.date).map(e=>({date:e.date,title:e.title,kind:'امتحان',auto:'exam',refId:e.id,done:e.done}));
   const autoLessons=[];
+  const autoCreated=[];
   (db.subjects||[]).forEach(s=>{ const cur=db.curriculum[s.id];
     (cur?.chapters||[]).forEach(c=>(c.topics||[]).forEach(t=>(t.lessons||[]).forEach(l=>{
       if(l.remindAt&&!l.completed) autoLessons.push({date:l.remindAt,title:l.title,kind:'درس',auto:'lesson',refId:`${s.id}/${c.id}/${t.id}/${l.id}`,done:false});
+      if(l.createdAt) autoCreated.push({date:l.createdAt.slice(0,10),title:l.title,kind:'درس',auto:'created',refId:`${s.id}/${c.id}/${t.id}/${l.id}`,done:!!l.completed});
     })));
   });
-  const evsOn=(key)=>[...(db.events||[]).filter(e=>e.date===key).map(e=>({...e,auto:null})),...autoExams.filter(e=>e.date===key),...autoLessons.filter(e=>e.date===key)];
+  const evsOn=(key)=>[...(db.events||[]).filter(e=>e.date===key).map(e=>({...e,auto:null})),...autoExams.filter(e=>e.date===key),...autoLessons.filter(e=>e.date===key),...autoCreated.filter(e=>e.date===key)];
   const first=new Date(y,m,1); const days=new Date(y,m+1,0).getDate();
   let cells=''; for(let i=0;i<first.getDay();i++) cells+='<div></div>';
   for(let d=1;d<=days;d++){
     const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const evs=evsOn(key);
     const isT=key===tkey;
-    cells+=`<div class="cal-day ${isT?'today':''} ${evs.length?'has':''}" data-day="${key}"><b>${d}</b>${evs.slice(0,2).map(e=>`<div>• ${e.auto==='exam'?'◉':e.auto==='lesson'?'📖':'📌'} ${esc(e.title.slice(0,12))}</div>`).join('')}${evs.length>2?`<div>+${evs.length-2}</div>`:''}</div>`;
+    cells+=`<div class="cal-day ${isT?'today':''} ${evs.length?'has':''}" data-day="${key}"><b>${d}</b>${evs.slice(0,2).map(e=>`<div>• ${e.auto==='exam'?'◉':e.auto==='lesson'?'🔔':e.auto==='created'?'📝':'📌'} ${esc(e.title.slice(0,12))}</div>`).join('')}${evs.length>2?`<div>+${evs.length-2}</div>`:''}</div>`;
   }
   // دروس مقترحة اليوم تلقائيًا (أول الدروس غير المكتملة)
   const suggested=nextLessons(db,pace);
@@ -78,9 +83,9 @@ export async function pCalendar(el){
   <div class="os-panel"><div class="row spread"><span class="eyebrow">جدولي المدرسي الأسبوعي</span><a class="os-go" href="#/timetable">إدارة ←</a></div>
   <div class="row" style="gap:6px">${DAY_ORDER.map(d=>{const n=(db.timetable[d]||[]).length;return `<a class="chip" href="#/timetable" style="text-decoration:none${d===today.getDay()?';border-color:var(--primary)':''}">${DAY_NAMES[d]} · ${n}</a>`;}).join('')}</div></div>
   <div class="card"><div class="cal-grid">${['ح','ن','ث','ر','خ','ج','س'].map(d=>`<b class="muted" style="text-align:center">${d}</b>`).join('')}${cells}</div>
-  <p class="muted small">◉ امتحان تلقائي · 📌 يدوي — الامتحانات والدروس تظهر هنا بدون إضافة يدوية.</p></div>
+  <p class="muted small">◉ امتحان · 🔔 تذكير درس · 📝 درس سُجل بهذا اليوم · 📌 يدوي — تظهر تلقائيًا بدون إضافة يدوية.</p></div>
   <div class="os-panel"><div class="row spread"><span class="eyebrow">خطة اليوم · تلقائي</span><span class="row">دروس/يوم: <input id="pace" type="number" min="1" max="20" value="${pace}" style="width:64px"></span></div>
-  ${suggested.map(n=>`<a class="list-item" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}"><span>📖</span><div><b>${esc(n.l.title)}</b><div class="muted small">${esc(n.s.name)} · ${esc(n.c.title)} · ${n.l.duration||30} د</div></div></a>`).join('')||'<p class="muted small">لا دروس متبقية 🎉</p>'}
+  ${suggested.map(n=>`<a class="list-item" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}"><span>📖</span><div><b>${esc(n.l.title)}</b><div style="margin:4px 0">${subjBadge(db, n.s.id)}</div><div class="muted small">${esc(n.c.title)} · ${n.l.duration||30} د</div></div></a>`).join('')||'<p class="muted small">لا دروس متبقية 🎉</p>'}
   ${upcoming.map(e=>{const dl=daysLabel(e.date);return `<a class="list-item" href="#/exam/${e.id}"><span>◉</span><div><b>${esc(e.title)} · ${esc(dl.txt)}</b><div class="muted small">${esc(examScopeLabel(db,e))} · ${esc(e.date)}</div></div></a>`;}).join('')}</div>
   <h3>مواعيد يدوية</h3>${(db.events||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`<div class="list-item"><span>📌</span><div style="flex:1"><b>${esc(e.title)}</b><div class="muted small">${esc(e.date)}${e.time ? ' · ' + esc(e.time) : ''} · ${esc(e.kind || '')} ${esc(e.notes || '')}</div></div><button class="btn sm ghost" data-del="${e.id}">✕</button></div>`).join('')||'<div class="card muted">لا مواعيد يدوية.</div>'}`;
   el.querySelector('#pace').onchange=e=>{ db.settings.lessonsPerDay=Math.max(1,+e.target.value||3); saveLocal(); pCalendar(el); };
@@ -107,6 +112,6 @@ export async function pCalendar(el){
     const evs=evsOn(d.dataset.day);
     if(!evs.length) return toast('لا مواعيد في '+d.dataset.day);
     const box=evs.map(e=>`${e.auto==='exam'?'◉':'📌'} ${e.title}${e.done?' ✅':''}`).join('\n');
-    modal(`<h3>📅 ${d.dataset.day}</h3>${evs.map(e=>`<a class="list-item" href="${e.auto==='exam'?'#/exam/'+e.refId:e.auto==='lesson'?'#/lesson/'+e.refId:'#/calendar'}"><span>${e.auto==='exam'?'◉':e.auto==='lesson'?'📖':'📌'}</span><div><b>${esc(e.title)}</b><div class="muted small">${e.auto === 'exam' ? 'تذكير امتحان' + (e.done ? ' ✅' : '') : e.auto === 'lesson' ? 'تذكير درس' : 'موعد' + (e.time ? ' · ' + esc(e.time) : '')}</div></div></a>`).join('')}`);
+    modal(`<h3>📅 ${d.dataset.day}</h3>${evs.map(e=>`<a class="list-item" href="${e.auto==='exam'?'#/exam/'+e.refId:(e.auto==='lesson'||e.auto==='created')?'#/lesson/'+e.refId:'#/calendar'}"><span>${e.auto==='exam'?'◉':e.auto==='lesson'?'🔔':e.auto==='created'?'📝':'📌'}</span><div><b>${esc(e.title)}</b><div class="muted small">${e.auto === 'exam' ? 'تذكير امتحان' + (e.done ? ' ✅' : '') : e.auto === 'lesson' ? 'تذكير درس' : e.auto === 'created' ? 'درس سُجل بهذا اليوم' + (e.done ? ' ✅' : '') : 'موعد' + (e.time ? ' · ' + esc(e.time) : '')}</div></div></a>`).join('')}`);
   });
 }

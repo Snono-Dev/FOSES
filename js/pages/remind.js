@@ -3,6 +3,7 @@ import { esc } from '../config.js';
 import { toast } from '../ui.js';
 import { collectReminders, touchActivity } from '../models.js';
 import { icon } from '../icons.js';
+import { subjBadge } from '../components.js';
 
 export async function pReminders(el) {
   const db = getDB();
@@ -12,6 +13,7 @@ export async function pReminders(el) {
   const up = all.filter(r => !r.overdue && !r.today);
   const card = r => `<div class="card" style="border-inline-start:3px solid ${r.overdue ? 'var(--bad)' : r.kind === 'exam' ? 'var(--warn)' : 'var(--primary)'}">
     <div class="row spread"><b>${r.kind === 'exam' ? '◉' : '📖'} ${esc(r.title)}</b><span class="chip">${r.overdue ? 'متأخر' : r.today ? 'اليوم' : esc(r.date)}</span></div>
+    <div style="margin:4px 0">${r.kind === 'lesson' ? subjBadge(db, r.ref.s.id) : ''}</div>
     <div class="muted small">${esc(r.sub)}</div>
     <div class="row" style="margin-top:8px"><a class="btn sm" href="${r.link}">فتح</a>`
     + (r.kind === 'exam'
