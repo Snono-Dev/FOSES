@@ -8,8 +8,8 @@
   "orientation": "any",
   "dir": "rtl",
   "lang": "ar",
-  "background_color": "#070B14",
-  "theme_color": "#070B14",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "categories": ["education", "productivity"],
   "icons": [
     { "src": "./assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
