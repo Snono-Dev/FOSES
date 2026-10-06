@@ -1,4 +1,4 @@
-const CACHE='foses-v48';
+const CACHE='foses-v54';
 const ASSETS=['./','./index.html','./manifest.webmanifest'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));
@@ -56,7 +56,8 @@ function idbPut(key, val) {
 async function checkReminders(source) {
   const snap = await idbGet('reminders');
   if (!snap || !snap.list) return;
-  const t = new Date().toISOString().slice(0, 10);
+  const n = new Date();
+  const t = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
   const due = snap.list.filter(r => r.date && r.date <= t);
   if (!due.length) return;
   const seen = (await idbGet('notified')) || {};

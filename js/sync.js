@@ -47,8 +47,14 @@ export async function initialSync(){
       const db=getDB();
       const localHas=hasLocalData(db);
       const remoteHas=Object.values(out).some(v=>Array.isArray(v)?v.length:(v&&typeof v==='object'&&Object.keys(v).length>0));
+      // توحيد صيغة المسحوب قبل المقارنة (مستودعات قديمة بشكل قديم)
+      const fake={subjects:out.subjects,curriculum:out.curriculum,exams:out.exams,timetable:out.timetable};
+      try{ normalizeExams(fake); }catch{}
+      try{ ensureTimetable(fake); }catch{}
+      const normOut={...out};
+      ['subjects','curriculum','exams','timetable'].forEach(k=>{ if(out[k]!==undefined) normOut[k]=fake[k]; });
       if(localHas&&remoteHas){
-        const same=Object.keys(out).every(k=>sameJSON(db[k],out[k]));
+        const same=Object.keys(normOut).every(k=>sameJSON(db[k],normOut[k]));
         if(!same){
           const choice=await askDirection();
           shas=newShas;
@@ -58,7 +64,7 @@ export async function initialSync(){
           }
         }
       }
-      for(const [k,v] of Object.entries(out)){ if(v!==undefined) db[k]=v; }
+      for(const [k,v] of Object.entries(normOut)){ if(v!==undefined) db[k]=v; }
       normalizeExams(db);
       ensureTimetable(db);
       const { saveLocal }=await import('./store.js'); saveLocal();

@@ -1,6 +1,6 @@
 import { getDB, saveLocal } from '../store.js';
-import { computeStats, levelFor, touchActivity, nextLessons, examScopeLabel, daysLabel, DAY_NAMES, DAY_ORDER } from '../models.js';
-import { esc, uid, now } from '../config.js';
+import { computeStats, levelFor, touchActivity, nextLessons, examScopeLabel, daysLabel, DAY_NAMES, DAY_ORDER, pagesLabel } from '../models.js';
+import { esc, uid, now, todayKey } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
 import { icon } from '../icons.js';
 import { subjBadge } from '../components.js';
@@ -56,7 +56,7 @@ export async function pCalendar(el){
   if(db.settings.lessonsPerDay===undefined) db.settings.lessonsPerDay=3;
   const pace=db.settings.lessonsPerDay;
   const today=new Date(); const y=today.getFullYear(), m=today.getMonth();
-  const tkey=today.toISOString().slice(0,10);
+  const tkey=todayKey(today);
   // أحداث تلقائية: تذكيرات الامتحانات + تذكيرات الدروس (بدون إضافة يدوية)
   const autoExams=(db.exams||[]).filter(e=>e.date).map(e=>({date:e.date,title:e.title,kind:'امتحان',auto:'exam',refId:e.id,done:e.done}));
   const autoLessons=[];
@@ -74,7 +74,8 @@ export async function pCalendar(el){
     const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const evs=evsOn(key);
     const isT=key===tkey;
-    cells+=`<div class="cal-day ${isT?'today':''} ${evs.length?'has':''}" data-day="${key}"><b>${d}</b>${evs.slice(0,2).map(e=>`<div>• ${e.auto==='exam'?'◉':e.auto==='lesson'?'🔔':e.auto==='created'?'📝':'📌'} ${esc(e.title.slice(0,12))}</div>`).join('')}${evs.length>2?`<div>+${evs.length-2}</div>`:''}</div>`;
+    const dot = e => e.auto === 'exam' ? 'var(--warn)' : e.auto === 'lesson' ? 'var(--primary)' : e.auto === 'created' ? 'var(--secondary)' : 'var(--muted)';
+    cells += `<div class="cal-day ${isT ? 'today' : ''} ${evs.length ? 'has' : ''}" data-day="${key}"><b>${d}</b>${evs.length ? `<span class="cal-dots">${evs.slice(0, 8).map(e => `<i style="background:${dot(e)}"></i>`).join('')}</span>${evs.length > 8 ? `<div class="muted small">+${evs.length - 8}</div>` : ''}` : ''}</div>`;
   }
   // دروس مقترحة اليوم تلقائيًا (أول الدروس غير المكتملة)
   const suggested=nextLessons(db,pace);
@@ -83,7 +84,7 @@ export async function pCalendar(el){
   <div class="os-panel"><div class="row spread"><span class="eyebrow">جدولي المدرسي الأسبوعي</span><a class="os-go" href="#/timetable">إدارة ←</a></div>
   <div class="row" style="gap:6px">${DAY_ORDER.map(d=>{const n=(db.timetable[d]||[]).length;return `<a class="chip" href="#/timetable" style="text-decoration:none${d===today.getDay()?';border-color:var(--primary)':''}">${DAY_NAMES[d]} · ${n}</a>`;}).join('')}</div></div>
   <div class="card"><div class="cal-grid">${['ح','ن','ث','ر','خ','ج','س'].map(d=>`<b class="muted" style="text-align:center">${d}</b>`).join('')}${cells}</div>
-  <p class="muted small">◉ امتحان · 🔔 تذكير درس · 📝 درس سُجل بهذا اليوم · 📌 يدوي — تظهر تلقائيًا بدون إضافة يدوية.</p></div>
+  <p class="muted small"><b style="color:var(--warn)">●</b> امتحان · <b style="color:var(--primary)">●</b> تذكير درس · <b style="color:var(--secondary)">●</b> درس مسجل · <b style="color:var(--muted)">●</b> يدوي — اضغط اليوم لعرض التفاصيل.</p></div>
   <div class="os-panel"><div class="row spread"><span class="eyebrow">خطة اليوم · تلقائي</span><span class="row">دروس/يوم: <input id="pace" type="number" min="1" max="20" value="${pace}" style="width:64px"></span></div>
   ${suggested.map(n=>`<a class="list-item" href="#/lesson/${n.s.id}/${n.c.id}/${n.t.id}/${n.l.id}"><span>📖</span><div><b>${esc(n.l.title)}</b><div style="margin:4px 0">${subjBadge(db, n.s.id)}</div><div class="muted small">${esc(n.c.title)} · ${n.l.duration||30} د</div></div></a>`).join('')||'<p class="muted small">لا دروس متبقية 🎉</p>'}
   ${upcoming.map(e=>{const dl=daysLabel(e.date);return `<a class="list-item" href="#/exam/${e.id}"><span>◉</span><div><b>${esc(e.title)} · ${esc(dl.txt)}</b><div class="muted small">${esc(examScopeLabel(db,e))} · ${esc(e.date)}</div></div></a>`;}).join('')}</div>
@@ -109,9 +110,13 @@ export async function pCalendar(el){
   };
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{db.events=db.events.filter(e=>e.id!==b.dataset.del);saveLocal();pCalendar(el);});
   el.querySelectorAll('[data-day]').forEach(d=>d.onclick=()=>{
-    const evs=evsOn(d.dataset.day);
-    if(!evs.length) return toast('لا مواعيد في '+d.dataset.day);
-    const box=evs.map(e=>`${e.auto==='exam'?'◉':'📌'} ${e.title}${e.done?' ✅':''}`).join('\n');
-    modal(`<h3>📅 ${d.dataset.day}</h3>${evs.map(e=>`<a class="list-item" href="${e.auto==='exam'?'#/exam/'+e.refId:(e.auto==='lesson'||e.auto==='created')?'#/lesson/'+e.refId:'#/calendar'}"><span>${e.auto==='exam'?'◉':e.auto==='lesson'?'🔔':e.auto==='created'?'📝':'📌'}</span><div><b>${esc(e.title)}</b><div class="muted small">${e.auto === 'exam' ? 'تذكير امتحان' + (e.done ? ' ✅' : '') : e.auto === 'lesson' ? 'تذكير درس' : e.auto === 'created' ? 'درس سُجل بهذا اليوم' + (e.done ? ' ✅' : '') : 'موعد' + (e.time ? ' · ' + esc(e.time) : '')}</div></div></a>`).join('')}`);
+    const key=d.dataset.day;
+    const evs=evsOn(key);
+    if(!evs.length) return toast('لا شيء في '+key);
+    modal(`<h3>📅 ${key}</h3>`
+    + evs.map(e=>{ const isLsn=e.auto==='lesson'||e.auto==='created';
+      let pg='';
+      if(isLsn){ const [sid,cid,tid,lid]=String(e.refId||'').split('/'); const l=db.curriculum[sid]?.chapters.find(c=>c.id===cid)?.topics.find(t=>t.id===tid)?.lessons.find(x=>x.id===lid); pg=pagesLabel(l?.pageFrom,l?.pageTo); }
+      return `<a class="list-item" href="${e.auto==='exam'?'#/exam/'+e.refId:isLsn?'#/lesson/'+e.refId:'#/calendar'}"><span>${e.auto==='exam'?'◉':e.auto==='lesson'?'🔔':e.auto==='created'?'📝':'📌'}</span><div><b>${esc(e.title)}</b>${isLsn?`<div style="margin:4px 0">${subjBadge(db, String(e.refId||'').split('/')[0])}${pg?` <span class="chip">${pg}</span>`:''}</div>`:''}<div class="muted small">${e.auto === 'exam' ? 'تذكير امتحان' + (e.done ? ' ✅' : '') : e.auto === 'lesson' ? 'تذكير درس' : e.auto === 'created' ? 'درس سُجل بهذا اليوم' + (e.done ? ' ✅' : '') : 'موعد' + (e.time ? ' · ' + esc(e.time) : '')}</div></div></a>`; }).join(''));
   });
 }

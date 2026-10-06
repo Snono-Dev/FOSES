@@ -5,8 +5,9 @@ export function toast(msg){
 }
 export function modal(html){
   const root=document.getElementById('modalRoot');
-  root.innerHTML=`<div class="modal-bg"><div class="modal">${html}</div></div>`;
+  root.innerHTML=`<div class="modal-bg"><div class="modal"><button class="modal-x" aria-label="إغلاق">✕</button>${html}</div></div>`;
   root.querySelector('.modal-bg').addEventListener('click',e=>{ if(e.target.classList.contains('modal-bg')) root.innerHTML=''; });
+  root.querySelector('.modal-x').addEventListener('click',()=>{ root.innerHTML=''; });
   const esc2=e=>{ if(e.key==='Escape') closeModal(); };
   document.addEventListener('keydown',esc2,{once:true});
   return ()=>root.innerHTML='';

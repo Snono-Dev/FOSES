@@ -11,5 +11,6 @@ export const CONFIG = {
 };
 export const uid = (p='id') => p+'-'+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-4);
 export const now = () => new Date().toISOString();
-export const todayKey = (d=new Date()) => d.toISOString().slice(0,10);
+// تاريخ محلي YYYY-MM-DD (وليس UTC — فرق التوقيت كان يخفي دروس اليوم بعد منتصف الليل)
+export const todayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 export function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }

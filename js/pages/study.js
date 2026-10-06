@@ -121,12 +121,13 @@ export async function pLesson(el,sid,cid,tid,lid){
   const tp=db.curriculum[sid]?.chapters.find(c=>c.id===cid)?.topics.find(t=>t.id===tid);
   const l=tp?.lessons.find(x=>x.id===lid);
   if(!l){ el.innerHTML='<div class="card">الدرس غير موجود</div>'; return; }
+  const sname=db.subjects.find(x=>x.id===sid)?.name||'';
   el.innerHTML=`<a href="#/topic/${sid}/${cid}/${tid}">← رجوع</a>
   <div class="card"><h2>${l.completed?'✅':''} ${esc(l.title)} ${l.favorite?'⭐':''}</h2>
+  <div class="muted small" style="margin-bottom:8px">${esc(sname)} › ${esc(db.curriculum[sid]?.chapters.find(c=>c.id===cid)?.title||'')} › ${esc(tp.title)}</div>
   ${pagesLabel(l.pageFrom,l.pageTo)||lectureLabel(l)?`<div class="row">${pagesLabel(l.pageFrom,l.pageTo)?`<span class="chip">${pagesLabel(l.pageFrom,l.pageTo)}</span>`:''}${lectureLabel(l)?`<span class="chip">${lectureLabel(l)}</span>`:''}</div>`:''}
   <p class="muted">${esc(l.desc||'')}</p>
   <div class="card" style="background:var(--card2)">${esc(l.content||'لا محتوى بعد — أضف شرح الدرس أدناه.')}</div>
-  <label>عنوان الدرس</label><input id="ltitle" value="${esc(l.title)}" placeholder="مثال: الدرس الأول — المقدمة">
   <div class="fld-row"><div class="fld"><span>رقم المحاضرة (اختياري — امسحه للإزالة)</span><input id="llec" type="number" placeholder="تلقائي" value="${l.lectureNo ?? ''}"></div>
   <div class="fld"><span>تاريخ الإضافة (تلقائي)</span><input value="${esc((l.createdAt || '').slice(0, 10))}" disabled></div></div>
   <label>المدة (دقيقة)</label><input id="dur" type="number" value="${l.duration||30}">
@@ -141,7 +142,7 @@ export async function pLesson(el,sid,cid,tid,lid){
     <button class="btn ghost" id="fav"><span class="ic">${icon('star', 16)}</span> ${l.favorite ? 'إزالة من المفضلة' : 'مفضلة'}</button>
     <button class="btn ghost" id="save"><span class="ic">${icon('check', 16)}</span> حفظ</button>
   </div></div>`;
-  const save=()=>{ l.title=el.querySelector('#ltitle').value.trim()||l.title; l.lectureNo=el.querySelector('#llec').value==='' ? null : +el.querySelector('#llec').value; l.duration=+el.querySelector('#dur').value||30; l.content=el.querySelector('#content').value; l.notes=el.querySelector('#notes').value; l.remindAt=el.querySelector('#remind').value||null; l.pageFrom=+el.querySelector('#pfrom').value||null; l.pageTo=+el.querySelector('#pto').value||l.pageFrom; saveLocal(); toast('تم الحفظ 💾'); };
+  const save=()=>{ l.lectureNo=el.querySelector('#llec').value==='' ? null : +el.querySelector('#llec').value; l.duration=+el.querySelector('#dur').value||30; l.content=el.querySelector('#content').value; l.notes=el.querySelector('#notes').value; l.remindAt=el.querySelector('#remind').value||null; l.pageFrom=+el.querySelector('#pfrom').value||null; l.pageTo=+el.querySelector('#pto').value||l.pageFrom; saveLocal(); toast('تم الحفظ 💾'); };
   el.querySelector('#save').onclick=save;
   el.querySelector('#norem') && (el.querySelector('#norem').onclick=()=>{ l.remindAt=null; saveLocal(); pLesson(el,sid,cid,tid,lid); });
   el.querySelector('#fav').onclick=()=>{ l.favorite=!l.favorite; saveLocal(); pLesson(el,sid,cid,tid,lid); };

@@ -1,5 +1,5 @@
 import { getDB, saveLocal } from '../store.js';
-import { computeStats, examScopeLabel, daysLabel, dueCount, collectReminders, nextLessons, touchActivity, pagesLabel, todaySubjects, DAY_NAMES } from '../models.js';
+import { computeStats, examScopeLabel, daysLabel, dueCount, collectReminders, touchActivity, pagesLabel, todaySubjects, DAY_NAMES, completedToday, lectureLabel } from '../models.js';
 import { esc } from '../config.js';
 import { getSession } from '../auth.js';
 import { toast } from '../ui.js';
@@ -30,6 +30,7 @@ export async function pDashboard(el) {
   const upcoming = [...db.exams].filter(e => !e.done).sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999')).slice(0, 5);
   const schoolToday = todaySubjects(db);
   const dayName = DAY_NAMES[new Date().getDay()];
+  const doneToday = completedToday(db);
 
   el.innerHTML = `
   <div class="greet"><span class="eyebrow">Free Open Source E-School</span>
@@ -53,6 +54,12 @@ export async function pDashboard(el) {
     ${upcoming.map(e => { const d = daysLabel(e.date); return `<a class="list-item" href="#/exam/${e.id}"><span>◉</span>
       <div><b>${esc(e.title)} · ${esc(d.txt)}</b><div class="muted small">${esc(examScopeLabel(db, e))}${e.date ? ' · ' + esc(e.date) : ''}</div></div></a>`; }).join('')
       || '<p class="muted">لا امتحانات قادمة — أضف تذكيرًا من صفحة الامتحانات.</p>'}
+  </div>
+
+  <div class="os-panel"><span class="eyebrow">منجز اليوم ✅</span>
+    ${doneToday.lessons.map(n => `<div class="list-item"><span>✅</span><div><b>${esc(n.l.title)}${lectureLabel(n.l) ? ' · ' + lectureLabel(n.l) : ''}</b><div class="muted small">${esc(n.s.name)} · ${esc(n.c.title)}</div></div></div>`).join('')}
+    ${doneToday.exams.map(e => `<div class="list-item"><span>✅</span><div><b>${esc(e.title)}</b><div class="muted small">تذكير امتحان منجز</div></div></div>`).join('')}
+    ${!doneToday.lessons.length && !doneToday.exams.length ? '<p class="muted">لم تُنجز شيئًا اليوم بعد — ابدأ من دروس اليوم بالأعلى 💪.</p>' : ''}
   </div>
 
   <div class="grid cols2">

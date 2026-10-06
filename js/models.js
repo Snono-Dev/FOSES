@@ -157,9 +157,24 @@ export function computeStats(db){
   const perSubject={};
   for(const s of db.subjects){
     const cur=db.curriculum[s.id]; let t=0,d=0;
-    (cur?.chapters||[]).forEach(c=>(c.topics||[]).forEach(tp=>(tp.lessons||[]).forEach(l=>{t++;total++;if(l.completed){d++;done++;}})));
-    perSubject[s.id]={total:t,done:d,pct:t?Math.round(d/t*100):0,finished:t>0&&d===t};
-    if(t>0&&d===t) subjectsDone++;
+    const chPcts=[]; let chFinished=0, chCount=0;
+    (cur?.chapters||[]).forEach(c=>{
+      chCount++;
+      const tpPcts=[]; let tpFinished=0, tpCount=0, ct=0, cd=0;
+      (c.topics||[]).forEach(tp=>{
+        tpCount++;
+        const ls=tp.lessons||[]; ct+=ls.length;
+        const dd=ls.filter(l=>l.completed).length; cd+=dd;
+        if(ls.length){ tpPcts.push(Math.round(dd/ls.length*100)); if(dd===ls.length) tpFinished++; }
+      });
+      t+=ct; d+=cd; total+=ct; done+=cd;
+      if(tpPcts.length) chPcts.push(Math.round(tpPcts.reduce((a,b)=>a+b,0)/tpPcts.length));
+      if(tpCount>0&&tpFinished===tpCount) chFinished++;
+    });
+    const subPct=chPcts.length?Math.round(chPcts.reduce((a,b)=>a+b,0)/chPcts.length):0;
+    const subFin=chCount>0&&chFinished===chCount;
+    perSubject[s.id]={total:t,done:d,pct:subPct,finished:subFin,chapters:chCount,chaptersDone:chFinished};
+    if(subFin) subjectsDone++;
   }
   const st=Object.keys(perSubject).length;
   return { total, done, left:total-done, pct: total?Math.round(done/total*100):0, perSubject,
@@ -174,7 +189,7 @@ export function levelFor(xp){
 export function touchActivity(db){
   const t=todayKey();
   if(db.progress.lastActiveDay!==t){
-    const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+    const y=todayKey(new Date(Date.now()-864e5));
     db.progress.streak = (db.progress.lastActiveDay===y) ? (db.progress.streak||0)+1 : 1;
     db.progress.lastActiveDay=t;
     if(db.progress.streak>=3 && !db.achievements.find(a=>a.id==='streak-3'))
@@ -204,7 +219,7 @@ export function normalizeExams(db) {
     if (e.notes === undefined) e.notes = '';
     if (e.done === undefined) e.done = false;
     if (e.doneAt === undefined) e.doneAt = null;
-    if (e.createdAt === undefined) e.createdAt = now();
+    if (e.createdAt === undefined) e.createdAt = e.doneAt || e.date || '';
     // إكمال الصفحات من المواضيع إن غابت
     if ((e.pageFrom == null) && e.fromTopicId) {
       const p = pagesForTopics(db, e.subjectId, e.fromTopicId, e.toTopicId);
@@ -273,6 +288,17 @@ export function daysLabel(dateStr) {
   if (diff === 1) return { txt: 'غدًا', cls: '' };
   if (diff > 1) return { txt: `بعد ${diff} يوم`, cls: '' };
   return { txt: `متأخر ${Math.abs(diff)} يوم`, cls: 'bad' };
+}
+
+// ما أُنجز اليوم (دروس + تذكيرات) — للوحة الرئيسية
+export function completedToday(db){
+  const t=todayKey(), lessons=[];
+  for(const s of (db.subjects||[])){ const cur=db.curriculum[s.id];
+    for(const c of (cur?.chapters||[])) for(const tp of (c.topics||[])) for(const l of (tp.lessons||[]))
+      if(l.completed&&l.lastStudied&&l.lastStudied.slice(0,10)===t) lessons.push({s,c,tp,l});
+  }
+  const exams=(db.exams||[]).filter(e=>e.done&&e.doneAt&&e.doneAt.slice(0,10)===t);
+  return { lessons, exams };
 }
 
 // أول الدروس غير المكتملة بالترتيب (يُستخدم للتركيز والخطة التلقائية)
