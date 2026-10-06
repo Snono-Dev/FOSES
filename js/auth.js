@@ -1,30 +1,31 @@
 // Auth: PAT (recommended, 100% static-safe) + Device Flow (client_id only) + Demo.
 // SECURITY: never store client_secret in frontend. Code-flow with secret is NOT supported here.
+import { LS, SS } from './storage.js';
 const SESS='foses-sess-v1';
 export function getSession(){
-  try{ return JSON.parse(sessionStorage.getItem(SESS)||localStorage.getItem('foses-remember')||'null'); }catch{ return null; }
+  try{ return JSON.parse(SS.get(SESS)||LS.get('foses-remember')||'null'); }catch{ return null; }
 }
 export function setSession(s, remember=false){
-  sessionStorage.setItem(SESS, JSON.stringify(s));
-  if(remember) localStorage.setItem('foses-remember', JSON.stringify({...s, token: s.token ? 'remembered' : null}));
-  else localStorage.removeItem('foses-remember');
+  SS.set(SESS, JSON.stringify(s));
+  if(remember) LS.set('foses-remember', JSON.stringify({...s, token: s.token ? 'remembered' : null}));
+  else LS.del('foses-remember');
 }
-export function clearSession(){ sessionStorage.removeItem(SESS); localStorage.removeItem('foses-remember'); localStorage.removeItem('foses-token'); }
+export function clearSession(){ SS.del(SESS); LS.del('foses-remember'); LS.del('foses-token'); }
 // دمج تحديث في الجلسة المحفوظة (مثل الفرع الصحيح) في المخزنين معًا
 export function updateSession(patch){
   try{
     const cur=getSession()||{};
     const next={...cur,...patch};
-    sessionStorage.setItem(SESS, JSON.stringify(next));
-    if(localStorage.getItem('foses-remember')) localStorage.setItem('foses-remember', JSON.stringify({...next, token: next.token ? 'remembered' : null}));
+    SS.set(SESS, JSON.stringify(next));
+    if(LS.get('foses-remember')) LS.set('foses-remember', JSON.stringify({...next, token: next.token ? 'remembered' : null}));
   }catch{}
 }
 
 export function getToken(){
-  return sessionStorage.getItem('foses-token') || localStorage.getItem('foses-token') || null;
+  return SS.get('foses-token') || LS.get('foses-token') || null;
 }
 export function setToken(t, persist=false){
-  if(persist) localStorage.setItem('foses-token', t); else sessionStorage.setItem('foses-token', t);
+  if(persist) LS.set('foses-token', t); else SS.set('foses-token', t);
 }
 
 export async function fetchMe(token){

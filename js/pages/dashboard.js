@@ -4,6 +4,7 @@ import { esc } from '../config.js';
 import { getSession } from '../auth.js';
 import { toast } from '../ui.js';
 import { notifyNow } from '../notify.js';
+import { SS } from '../storage.js';
 
 function greeting() {
   const h = new Date().getHours();
@@ -17,8 +18,8 @@ export async function pDashboard(el) {
   const st = computeStats(db);
   const sess = getSession();
   const due = dueCount(db);
-  if (due > 0 && !sessionStorage.getItem('foses-due-toast')) {
-    sessionStorage.setItem('foses-due-toast', '1');
+  if (due > 0 && !SS.get('foses-due-toast')) {
+    SS.set('foses-due-toast', '1');
     setTimeout(() => toast(`🔔 لديك ${due} تذكير مستحق — راجع التنبيهات`), 1200);
     try { if ('Notification' in window && Notification.permission === 'granted') notifyNow('🔔 FOSES — تذكيرات مستحقة', `لديك ${due} تذكير (دروس وامتحانات) — اضغط للمراجعة`); } catch {}
   }

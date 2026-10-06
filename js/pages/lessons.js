@@ -4,12 +4,13 @@ import { esc, uid, now } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
 import { touchActivity, pagesLabel } from '../models.js';
 import { icon } from '../icons.js';
+import { LS } from '../storage.js';
 
 export async function pLessons(el, preSid = null, preCid = null, preTid = null) {
   const db = getDB();
   if (!db.subjects.length) { el.innerHTML = `<span class="eyebrow">الدروس</span><h2 style="margin-top:0">الدروس</h2><div class="card muted">أنشئ مادة وفصلًا وموضوعًا أولًا من <a href="#/subjects">المواد</a>.</div>`; return; }
   let savedF = {};
-  try { savedF = JSON.parse(localStorage.getItem('foses-lesson-filter') || '{}'); } catch {}
+  try { savedF = JSON.parse(LS.get('foses-lesson-filter') || '{}'); } catch {}
   const chExists = (sid, cid) => (db.curriculum[sid]?.chapters || []).some(c => c.id === cid);
   const tpExists = (sid, cid, tid) => (db.curriculum[sid]?.chapters || []).find(c => c.id === cid)?.topics?.some(t => t.id === tid);
   let st;
@@ -21,7 +22,7 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
     const tid = (cid && savedF.tid && tpExists(sid, cid, savedF.tid)) ? savedF.tid : '';
     st = { sid, cid, tid, q: savedF.q || '', f: savedF.f || 'todo' };
   }
-  const saveFilter = () => { try { localStorage.setItem('foses-lesson-filter', JSON.stringify({ sid: st.sid, cid: st.cid, tid: st.tid, f: st.f, q: st.q })); } catch {} };
+  const saveFilter = () => { try { LS.set('foses-lesson-filter', JSON.stringify({ sid: st.sid, cid: st.cid, tid: st.tid, f: st.f, q: st.q })); } catch {} };
 
   el.innerHTML = `<span class="eyebrow">الدروس</span><div class="row spread"><h2 style="margin-top:0"><span class="h-ic">${icon('book', 20)}</span> تبويب الدروس</h2><button class="btn" id="naddOpen"><span class="ic">${icon('plus', 16)}</span> إضافة درس</button></div>
   <details class="filter-box"><summary><span class="h-ic">${icon('search', 18)}</span> تصفية وبحث <span class="chip hidden" id="fcount"></span></summary><div class="fld-row">

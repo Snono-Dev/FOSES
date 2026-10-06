@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="./css/styles.css?v=42">
+<link rel="stylesheet" href="./css/styles.css?v=43">
 </head>
 <body>
 <div id="splash">
@@ -50,13 +50,17 @@
 <div id="modalRoot"></div>
 
 <script>
+window.__fosesErr=null;
+window.addEventListener('error',function(e){try{window.__fosesErr=String(e.message||e.type||'script-error')}catch{}},true);
+window.addEventListener('unhandledrejection',function(e){try{window.__fosesErr='promise: '+String((e.reason&&e.reason.message)||e.reason)}catch{}});
 if (location.protocol === 'file:') {
   document.write('<div style="background:#7f1d1d;color:#fff;padding:12px;text-align:center;font-weight:700">⚠️ لا تفتح الملف بالنقر المزدوج — شغّل سيرفرًا محليًا ثم افتح http://localhost:8080 — انظر README</div>');
 }
 setTimeout(function(){
   var app=document.getElementById('app');
   if(app && !app.innerHTML){
-    app.innerHTML='<div class="card">⚠️ تعذّر تحميل التطبيق. الأسباب الشائعة:<br>1) فتحت الملف مباشرة (file://) — استخدم سيرفرًا محليًا ثم افتح <b>http://127.0.0.1:8080</b><br>2) عطّل مانع الإعلانات للصفحة المحلية.<br>3) استخدم متصفحًا حديثًا (Chrome/Edge).</div>';
+    var err=window.__fosesErr?'<br><br>🔍 الخطأ الفعلي: <span class="kbd" dir="ltr">'+window.__fosesErr+'</span>':'';
+    app.innerHTML='<div class="card">⚠️ تعذّر تحميل التطبيق. الأسباب الشائعة:<br>1) فتحت الملف مباشرة (file://) — استخدم سيرفرًا محليًا ثم افتح <b>http://127.0.0.1:8080</b><br>2) عطّل مانع الإعلانات للصفحة المحلية.<br>3) استخدم متصفحًا حديثًا (Chrome/Edge).'+err+'</div>';
     var sp=document.getElementById('splash'); if(sp) sp.classList.add('done');
   }
 },6000);
@@ -68,6 +72,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-<script type="module" src="./js/app.js?v=42"></script>
+<script type="module" src="./js/app.js?v=43"></script>
 </body>
 </html>

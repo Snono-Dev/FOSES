@@ -8,6 +8,7 @@ import { esc, CONFIG, now } from '../config.js';
 import { toast, modal, closeModal, download } from '../ui.js';
 import { ensurePermission, pushSupport, periodicSupport, registerPeriodic, genVapid, subscribePush, pushState, unsubscribePush, mirrorReminders } from '../notify.js';
 import { icon } from '../icons.js';
+import { SS } from '../storage.js';
 
 export async function pLogin(el){
   const sess=getSession();
@@ -36,7 +37,7 @@ export async function pLogin(el){
     try{
       const me=await fetchMe(tok);
       const isPrivate=el.querySelector('#priv').checked;
-      setToken(tok,true); sessionStorage.setItem('foses-token',tok);
+      setToken(tok,true); SS.set('foses-token',tok);
       setSession({login:me.login,name:me.name||me.login,avatar:me.avatar_url,email:me.email,id:me.id,repoName:CONFIG.dataRepoName,branch:'main',private:isPrivate}, true);
       document.getElementById('avatar')?.classList.remove('hidden');
       const av=document.getElementById('avatar'); if(av) av.src=me.avatar_url;
@@ -51,7 +52,7 @@ export async function pLogin(el){
       el.querySelector('#dmsg').innerHTML=`افتح <a href="${d.verification_uri}" target="_blank">${d.verification_uri}</a> وأدخل الكود <b class="kbd">${d.user_code}</b> ثم انتظر...`;
       const t=await devicePoll(cid,d.device_code,d.interval||5);
       const me=await fetchMe(t.access_token);
-      setToken(t.access_token,true); sessionStorage.setItem('foses-token',t.access_token);
+      setToken(t.access_token,true); SS.set('foses-token',t.access_token);
       setSession({login:me.login,name:me.name||me.login,avatar:me.avatar_url,email:me.email,id:me.id,repoName:CONFIG.dataRepoName,branch:'main',private:true}, true);
       await initialSync(); location.hash='#/dashboard';
     }catch(e){ toast('فشل الربط: '+e.message); }
@@ -254,7 +255,6 @@ export async function pRepo(el){
     await initialSync();
     pRepo(el); toast('تم التبديل ✅');
   }
-}
 }
 
 async function runDiag(out) {
