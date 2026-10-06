@@ -16,7 +16,7 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
   if (preSid) {
     st = { sid: preSid, cid: preCid || '', tid: preTid || '', q: '', f: savedF.f || 'todo' };
   } else {
-    const sid = (savedF.sid && db.subjects.some(s => s.id === savedF.sid)) ? savedF.sid : '');
+    const sid = (savedF.sid && db.subjects.some(s => s.id === savedF.sid)) ? savedF.sid : '';
     const cid = (savedF.cid && chExists(sid, savedF.cid)) ? savedF.cid : '';
     const tid = (cid && savedF.tid && tpExists(sid, cid, savedF.tid)) ? savedF.tid : '';
     st = { sid, cid, tid, q: savedF.q || '', f: savedF.f || 'todo' };
