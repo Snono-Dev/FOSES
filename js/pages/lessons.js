@@ -162,6 +162,7 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
       const n = collect().find(x => x.l.id === b.dataset.done); if (!n) return;
       n.l.completed = !n.l.completed;
       if (n.l.completed) { n.l.lastStudied = new Date().toISOString(); db.progress.xp = (db.progress.xp || 0) + 50; db.progress.studyMinutes = (db.progress.studyMinutes || 0) + (n.l.duration || 30); touchActivity(db); toast('أحسنت! +50 XP 🎉'); }
+      else { db.progress.xp = Math.max(0, (db.progress.xp || 0) - 50); toast('أُلغي الإكمال — 50 XP ⏸️'); }
       saveLocal(); drawList();
     });
     el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {

@@ -51,6 +51,7 @@ export function toggleDone(db, id, rerender) {
   const e = db.exams.find(x => x.id === id); if (!e) return;
   e.done = !e.done; e.doneAt = e.done ? now() : null;
   if (e.done) { db.progress.xp = (db.progress.xp || 0) + 30; touchActivity(db); toast('أُنجز الامتحان! +30 XP 🎉'); }
+  else { db.progress.xp = Math.max(0, (db.progress.xp || 0) - 30); toast('أُلغي الإنجاز — 30 XP ⏸️'); }
   saveLocal(); rerender && rerender();
 }
 

@@ -11,7 +11,7 @@ let timer=null, syncing=false, lastStatus='local', lastError='';
 const subs=new Set();
 export const onSync=s=>{subs.add(s);return()=>subs.delete(s)};
 function setStatus(st,msg){ lastStatus=st; if(st==='error'&&msg)lastError=msg; if(st!=='error')lastError=''; subs.forEach(f=>{try{f(st,msg)}catch{}}); paintDot(st); }
-function paintDot(st){ const d=document.getElementById('syncDot'); if(!d) return; const paused=!autoSyncOn()&&(st==='local'); d.className='sync-dot'+(st==='synced'?'':st==='offline'?' offline':st==='local'?(paused?' paused':' off'):' err'); d.title='sync: '+st+(paused?' (التلقائية متوقفة)':'')+(st==='offline'?' (لا إنترنت)':'')+(st==='error'&&lastError?' — '+lastError:''); }
+function paintDot(st){ const d=document.getElementById('syncDot'); if(!d) return; const paused=!autoSyncOn()&&(st==='local'); d.className='sync-dot'+(st==='synced'?'':st==='syncing'?' busy':st==='offline'?' offline':st==='local'?(paused?' paused':' off'):' err'); d.title='sync: '+st+(st==='syncing'?' (جارٍ المزامنة…)':'')+(paused?' (التلقائية متوقفة)':'')+(st==='offline'?' (لا إنترنت)':'')+(st==='error'&&lastError?' — '+lastError:''); }
 const isOffline=()=> (typeof navigator!=='undefined') && ('onLine' in navigator) && !navigator.onLine;
 export const syncStatus=()=>lastStatus;
 export const lastSyncError=()=>lastError;

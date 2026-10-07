@@ -56,8 +56,10 @@ a{color:var(--accent2)}
 #topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;padding:10px 14px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;letter-spacing:2px}
 .brand-emoji{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:var(--card2);border:1px solid var(--line);font-size:17px}
-.sync-dot{font-size:11px;color:var(--ok)}
+.sync-dot{font-size:14px;color:var(--ok)}
 .sync-dot.off{color:var(--warn)}.sync-dot.err{color:var(--bad)}.sync-dot.paused{color:var(--muted)}.sync-dot.offline{color:var(--muted);opacity:.55}
+.sync-dot.busy{color:var(--accent2);animation:syncblink 1s infinite}
+@keyframes syncblink{50%{opacity:.25}}
 .sync pill,.sync-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:4px 10px;background:var(--card)}
 .sync-pill i{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:none}
 .sync-pill.busy i{background:var(--warn);animation:blink 1s infinite}
@@ -149,8 +151,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--primary);outline:none
 @media(min-width:760px){.bar-row{grid-template-columns:110px 1fr 46px;font-size:13px}}
 .chip{display:inline-block;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700}
 .subj-badge{--ac:var(--primary);background:color-mix(in srgb,var(--ac) 24%,transparent);border:1.5px solid var(--ac);font-weight:800;font-size:12.5px;padding:5px 12px}
-.list-item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0;text-decoration:none;color:inherit;transition:border-color .12s,transform .12s}
+.list-item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0;text-decoration:none;color:inherit;transition:border-color .12s,transform .12s;flex-wrap:wrap;min-width:0;row-gap:10px}
 .list-item:hover{border-color:var(--primary);transform:translateY(-1px)}
+.list-item>div{flex:1 1 170px;min-width:0;overflow-wrap:anywhere}
+.list-item .btn,.list-item .icon-btn{flex:none}
+.muted{overflow-wrap:anywhere}
+.chip{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dot{width:11px;height:11px;border-radius:50%;flex:none}
 #toasts{position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));inset-inline:12px;z-index:100;display:flex;flex-direction:column;gap:8px;align-items:center}
 .toast{background:#0A0A0C;color:#fff;border:1px solid var(--primary);padding:10px 16px;border-radius:12px;font-size:14px;box-shadow:var(--shadow)}

@@ -1,7 +1,7 @@
 import { getDB, saveLocal } from '../store.js';
 import { esc, uid, now } from '../config.js';
 import { toast, modal, closeModal } from '../ui.js';
-import { touchActivity, pagesLabel, lectureLabel } from '../models.js';
+import { touchActivity, pagesLabel, lectureLabel, DAY_NAMES, DAY_ORDER } from '../models.js';
 import { subjColor, lessonHead } from '../components.js';
 import { icon } from '../icons.js';
 
@@ -27,13 +27,15 @@ export async function pSubjects(el){
     const col=subjColor(s,i), p=subjectProgress(db,s.id);
     const num=String(i+1).padStart(2,'0');
     const go=p.current?`#/lesson/${s.id}/${p.current.c.id}/${p.current.t.id}/${p.current.l.id}`:`#/subject/${s.id}`;
-    const goLabel=p.current?'متابعة الدراسة ←':(p.total?'مراجعة المادة ←':'فتح المادة ←');
+    const goLabel=p.current?'متابعة الدرس ←':(p.total?'مراجعة المادة ←':'فتح المادة ←');
+    const days=DAY_ORDER.filter(d=>(db.timetable[d]||[]).some(e=>e.subjectId===s.id));
     return `<div class="os-sub" style="--ac:${col}">
       <div class="row spread"><span class="os-num">${num}</span><span class="dot" style="background:${col};color:${col}"></span></div>
       <div class="os-name">${esc(s.icon||'')} ${esc(s.name)}</div>
+      ${days.length?`<div class="row" style="gap:4px;margin-bottom:6px">${days.map(d=>`<span class="chip" style="font-size:11px${d===new Date().getDay()?';border-color:var(--ok);color:var(--ok)':''}">🏫 ${DAY_NAMES[d]}</span>`).join('')}</div>`:''}
       <div class="os-bar"><i style="width:${p.pct}%"></i></div>
       <div class="row spread"><span class="muted small">${p.curChapter?esc(p.curChapter.title):'لا فصول'} · ${p.done}/${p.total}</span><span class="chip">${p.pct}%</span></div>
-      <div class="row spread"><a class="btn sm" href="${go}">${goLabel}</a><button class="btn sm ghost" data-del="${s.id}"><span class="ic">${icon('trash', 15)}</span> حذف</button></div>
+      <div class="row spread"><span class="row"><a class="btn sm" href="${go}">${goLabel}</a>${p.current?`<a class="btn sm ghost" href="#/subject/${s.id}">فتح المادة</a>`:''}</span><button class="btn sm ghost" data-del="${s.id}"><span class="ic">${icon('trash', 15)}</span> حذف</button></div>
     </div>`;}).join('')||'<div class="card muted">لا مواد بعد.</div>'}</div>`;
   el.querySelector('#addSub').onclick=()=>{
     modal(`<h3>مادة جديدة</h3><label>الاسم</label><input id="sn" placeholder="مثال: الفيزياء"><label>الأيقونة</label><input id="si" value="📘"><div class="row" style="margin-top:12px"><button class="btn" id="ok">حفظ</button><button class="btn ghost" onclick="document.getElementById('modalRoot').innerHTML=''">إلغاء</button></div>`);
@@ -163,6 +165,7 @@ export async function pLesson(el,sid,cid,tid,lid){
   el.querySelector('#done').onclick=()=>{
     l.completed=!l.completed;
     if(l.completed){ l.lastStudied=new Date().toISOString(); db.progress.xp=(db.progress.xp||0)+50; db.progress.studyMinutes=(db.progress.studyMinutes||0)+(l.duration||30); touchActivity(db); toast('أحسنت! +50 XP 🎉'); }
+    else { db.progress.xp=Math.max(0,(db.progress.xp||0)-50); toast('أُلغي الإكمال — 50 XP ⏸️'); }
     saveLocal(); pLesson(el,sid,cid,tid,lid);
   };
 }
