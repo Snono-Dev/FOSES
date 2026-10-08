@@ -59,6 +59,7 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
       <div class="fld"><span>المدة (دقيقة)</span><input id="mndur" type="number" value="30"></div>
       <div class="fld"><span>رقم المحاضرة (تلقائي — قابل للتغيير)</span><input id="mnlec" type="number" placeholder="تلقائي"></div>
       <div class="fld"><span>تاريخ تذكير (بدونه لن يظهر في دروس اليوم)</span><input id="mnrem" type="date"></div>
+      <div class="fld"><span>ملاحظة (اختياري)</span><input id="mnnotes" placeholder="مثال: ركز على التعاريف"></div>
     </div>
     <div class="card" style="margin-top:10px;background:var(--card2)"><b>📚 المواضيع المشمولة (تلقائي)</b><div id="mdet" class="muted small">أدخل الصفحات لتُحدد المواضيع داخل المادة.</div>
     <div id="mmanual" class="hidden"><div class="fld-row" style="margin-top:8px"><div class="fld"><span>الفصل (يدوي)</span><select id="mnc"></select></div><div class="fld"><span>الموضوع (يدوي)</span><select id="mnt"></select></div></div></div>
@@ -68,7 +69,7 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
     const fS = () => { g('mns').innerHTML = db.subjects.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join(''); };
     const fC = sid => { g('mnc').innerHTML = chaptersOf(sid).map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join(''); };
     const fT = (sid, cid) => { g('mnt').innerHTML = topicsOf(sid, cid).map(t => `<option value="${t.id}">${esc(t.title)}</option>`).join(''); };
-    let det = null, manual = false;
+    let det = null, manual = false, lecTouched = false;
     const subjName = sid => db.subjects.find(s => s.id === sid)?.name || '';
     const detect = () => {
       const sid = g('mns').value, pf = +g('mnpf').value || null, pt = +g('mnpt').value || pf;
@@ -89,15 +90,16 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
       const nums = (tp?.lessons || []).map(l => +l.lectureNo).filter(n => !isNaN(n));
       return nums.length ? Math.max(...nums) + 1 : 1;
     };
-    const fillLec = () => { if (!g('mnlec').value) g('mnlec').value = nextLec(); };
+    const fillLec = () => { if (!lecTouched) g('mnlec').value = nextLec(); };
+    g('mnlec').oninput = () => { lecTouched = true; };
     fS(); g('mns').value = st.sid || db.subjects[0].id;
-    g('mns').onchange = () => { g('mnlec').value = ''; detect(); if (manual) { fC(g('mns').value); fT(g('mns').value, g('mnc').value); } };
+    g('mns').onchange = () => { detect(); if (manual) { fC(g('mns').value); fT(g('mns').value, g('mnc').value); } };
     g('mnpf').onchange = detect; g('mnpt').onchange = detect;
     g('mman').onclick = () => {
       manual = !manual;
       g('mmanual').classList.toggle('hidden', !manual);
       g('mman').textContent = manual ? 'إخفاء التحديد اليدوي' : 'تحديد يدوي';
-      if (manual) { fC(g('mns').value); fT(g('mns').value, g('mnc').value); g('mnc').onchange = () => fT(g('mns').value, g('mnc').value); }
+      if (manual) { fC(g('mns').value); fT(g('mns').value, g('mnc').value); g('mnc').onchange = () => { fT(g('mns').value, g('mnc').value); fillLec(); }; g('mnt').onchange = () => fillLec(); }
     };
     g('mcancel').onclick = () => closeModal();
     detect();
@@ -115,7 +117,7 @@ export async function pLessons(el, preSid = null, preCid = null, preTid = null) 
       const tp = topicsOf(sid, cid).find(t => t.id === tid); if (!tp) return toast('الموضوع غير موجود');
       const pf = +g('mnpf').value || null;
       const lec = g('mnlec').value === '' ? nextLec() : +g('mnlec').value;
-      tp.lessons.push({ id: uid('ls'), title: subjName(sid), desc: '', content: '', duration: +g('mndur').value || 30, pageFrom: pf, pageTo: +g('mnpt').value || pf, lectureNo: lec, remindAt: g('mnrem').value || null, completed: false, favorite: false, notes: '', lastStudied: null, createdAt: now() });
+      tp.lessons.push({ id: uid('ls'), title: subjName(sid), desc: '', content: '', duration: +g('mndur').value || 30, pageFrom: pf, pageTo: +g('mnpt').value || pf, lectureNo: lec, remindAt: g('mnrem').value || null, completed: false, favorite: false, notes: g('mnnotes').value.trim(), lastStudied: null, createdAt: now() });
       saveLocal(); closeModal();
       st.sid = ''; st.cid = ''; st.tid = ''; saveFilter(); syncFilters(); drawList(); toast(`أُضيفت المحاضرة ${lec} ✅`);
     };

@@ -5,6 +5,8 @@ import { getToken, getSession, updateSession } from './auth.js';
 import { CONFIG } from './config.js';
 import { normalizeExams, ensureTimetable } from './models.js';
 import { modal, closeModal } from './ui.js';
+import { LS } from './storage.js';
+const SYNC_COOLDOWN = 5 * 60 * 1000; // فحص تلقائي كل 5 دقائق كحد أقصى — اليدوي دائمًا فوري
 
 let shas={};
 let timer=null, syncing=false, lastStatus='local', lastError='';
@@ -30,9 +32,13 @@ function askDirection(){
   });
 }
 
-export async function initialSync(){
+export async function initialSync(force=false){
   const tok=getToken(), sess=getSession();
   if(!tok || !sess?.login){ setStatus('local'); return false; }
+  if(!force){
+    const last=+LS.get('foses-last-sync')||0;
+    if(Date.now()-last<SYNC_COOLDOWN){ setStatus('synced'); return true; }
+  }
   const repo=sess.repoName||CONFIG.dataRepoName, branch=sess.branch||'main';
   try{
     setStatus('syncing');
@@ -73,7 +79,7 @@ export async function initialSync(){
     } else {
       await pushNow('init 🌱 تهيئة مخزن الدراسة');
     }
-    setStatus('synced'); return true;
+    setStatus('synced'); try{ LS.set('foses-last-sync', String(Date.now())); }catch{} return true;
   }catch(e){ console.warn(e); if(isOffline()){ setStatus('offline'); } else setStatus('error',e.message); return false; }
 }
 
@@ -91,7 +97,7 @@ export async function pushNow(msg='📚 fos: sync'){
     const db=getDB();
     const snap={}; for(const f of CONFIG.files){ snap[f.replace('.json','')]=db[f.replace('.json','')] ?? null; }
     shas=await pushAll(tok,sess.login,sess.repoName||CONFIG.dataRepoName,snap,shas,sess.branch||'main');
-    setStatus('synced'); return true;
+    setStatus('synced'); try{ LS.set('foses-last-sync', String(Date.now())); }catch{} return true;
   }catch(e){ console.warn(e); if(isOffline()){ setStatus('offline'); } else setStatus('error',e.message); return false; }
   finally{ syncing=false; }
 }

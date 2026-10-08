@@ -27,9 +27,9 @@ export async function pTimetable(el) {
     box.innerHTML = list.length ? list.map((e, i) => {
       const s = db.subjects.find(x => x.id === e.subjectId);
       return `<div class="list-item"><span>${esc(s?.icon || '🏫')}</span><div style="flex:1"><b>${esc(s?.name || '؟')}</b>${e.time ? `<div class="muted small">${esc(e.time)}</div>` : ''}</div>
-      <span class="row" style="gap:2px"><button class="icon-btn" data-ttup="${d}:${i}" title="تحريك لأعلى" ${i === 0 ? 'disabled style="opacity:.35"' : ''}>▲</button><button class="icon-btn" data-ttdn="${d}:${i}" title="تحريك لأسفل" ${i === list.length - 1 ? 'disabled style="opacity:.35"' : ''}>▼</button></span>
+      <div class="tt-ctl"><button class="icon-btn" data-ttup="${d}:${i}" title="تحريك لأعلى" ${i === 0 ? 'disabled style="opacity:.35"' : ''}>▲</button><button class="icon-btn" data-ttdn="${d}:${i}" title="تحريك لأسفل" ${i === list.length - 1 ? 'disabled style="opacity:.35"' : ''}>▼</button>
       <select data-ttmv="${d}:${i}" title="نقل ليوم آخر" style="max-width:108px">${DAY_ORDER.map(dd => `<option value="${dd}" ${dd === d ? 'selected' : ''}>${DAY_NAMES[dd]}</option>`).join('')}</select>
-      <button class="btn sm ghost" data-ttdel="${d}:${i}"><span class="ic">${icon('trash', 15)}</span></button></div>`;
+      <button class="btn sm ghost" data-ttdel="${d}:${i}"><span class="ic">${icon('trash', 15)}</span></button></div></div>`;
     }).join('') : '<p class="muted small">يوم فارغ.</p>';
     box.querySelectorAll('[data-ttdel]').forEach(b => b.onclick = () => {
       const [dd, i] = b.dataset.ttdel.split(':');

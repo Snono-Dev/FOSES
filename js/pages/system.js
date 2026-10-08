@@ -75,7 +75,7 @@ export async function pSettings(el){
   const paintSync=()=>{ const on=db.settings.autoSync!==false; el.querySelector('#autoT').textContent=on?'إيقاف التلقائية':'تشغيل التلقائية'; el.querySelector('#syncState').textContent='الحالة: '+(on?'تلقائية ✅':'متوقفة ⏸️ — استخدم الزر اليدوي'); };
   paintSync();
   el.querySelector('#autoT').onclick=()=>{ db.settings.autoSync=db.settings.autoSync===false?true:false; saveLocal(); paintSync(); toast(db.settings.autoSync!==false?'المزامنة التلقائية تعمل ✅':'المزامنة التلقائية متوقفة ⏸️'); };
-  el.querySelector('#syncNow').onclick=async()=>{ toast('جارٍ المزامنة اليدوية...'); const ok=await initialSync(); toast(ok?'تمت المزامنة ✅':'تعذر — راجع صفحة GitHub للتشخيص'); pSettings(el); };
+  el.querySelector('#syncNow').onclick=async()=>{ toast('جارٍ المزامنة اليدوية...'); const ok=await initialSync(true); toast(ok?'تمت المزامنة ✅':'تعذر — راجع صفحة GitHub للتشخيص'); pSettings(el); };
   el.querySelector('#th').onclick=()=>document.getElementById('themeBtn').click();
   el.querySelector('#wipe').onclick=()=>{if(confirm('تصفير؟')){resetDemo();toast('تم التصفير');}};
   pushSetup(el, db);
@@ -240,7 +240,7 @@ export async function pRepo(el){
   <p class="muted small">${err ? 'آخر خطأ: <span class="kbd" dir="ltr">' + esc(err) + '</span>' : 'لا أخطاء مسجلة حاليًا.'}</p>
   <div class="row"><button class="btn sm" id="retry">🔄 إعادة المحاولة</button><button class="btn sm ghost" id="diagBtn">تشغيل التشخيص</button></div>
   <div id="diagOut" class="small" style="margin-top:8px"></div></div>`);
-  el.querySelector('#retry').onclick = async () => { toast('جارٍ إعادة المزامنة...'); await initialSync(); pRepo(el); };
+  el.querySelector('#retry').onclick = async () => { toast('جارٍ إعادة المزامنة...'); await initialSync(true); pRepo(el); };
   el.querySelector('#diagBtn').onclick = () => runDiag(el.querySelector('#diagOut'));
 
   // اختيار مستودع البيانات من مستودعاتك
@@ -275,7 +275,7 @@ export async function pRepo(el){
     await pushNow('fos: backup before switch');
     updateSession({ repoName: name, branch: 'main' });
     toast('جارٍ الجلب من الجديد...');
-    await initialSync();
+    await initialSync(true);
     pRepo(el); toast('تم التبديل ✅');
   }
 }
